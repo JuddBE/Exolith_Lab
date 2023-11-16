@@ -1,0 +1,6 @@
+#Ignore IDE
+
+.idea
+.idea/*
+
+/venv

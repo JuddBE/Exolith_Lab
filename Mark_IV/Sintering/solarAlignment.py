@@ -83,7 +83,7 @@ def solarElevationLogic():
     else:
         longitude = gps_dict["Longitude"]
 
-    location = (gps_dict["Lattitude"], longitude)
+    location = (gps_dict["Lattitude"], longitude) 
     when = (year, month, day, int(hour), int(minutes), int(seconds), 0)
 
     tz_NY = arrow.now().to('America/New_York').tzinfo

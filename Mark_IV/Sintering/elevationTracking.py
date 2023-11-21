@@ -41,6 +41,13 @@ class elevation_tracker:
         # Extract the passed data
         year, month, day, hour, minute, second, timezone = when
         latitude, longitude = location
+        print(year)
+        month = 11
+        day = 20
+        print(month)
+        print(day)
+        print(hour)
+        print(minute)
 
         # Math typing shortcuts
         rad, deg = math.radians, math.degrees
@@ -128,7 +135,7 @@ class elevation_tracker:
 
         # Should be set by user, either via flag or direct input
         accuracy = 0.3
-        degOffset = -2.2
+        degOffset = -2
 
         # Setup pin layout on RPI
         GPIO.setmode(GPIO.BCM)
@@ -162,8 +169,12 @@ class elevation_tracker:
             while degreeDifferenceX > accuracy or (degreeDifferenceX * (-1)) > accuracy:
 
                 self.logger.logInfo("Adjusting Elevation Angle...")
-
-                degreeDev = degreeDifferenceX * (10/3)
+                delay = 0.05
+                if abs(degreeDifferenceX) > 1.5:
+                    degreeDev = degreeDifferenceX * 8
+                else:
+                    degreeDev = degreeDifferenceX * 4
+                    delay = 0.2
 
                 degreeDev = math.floor(degreeDev)
 
@@ -176,7 +187,7 @@ class elevation_tracker:
 
                 for x in range(int(degreeDev)):
                     GPIO.output(STEP, GPIO.HIGH)
-                    sleep(0.2)  # Dictates how fast stepper motor will run
+                    sleep(delay)  # Dictates how fast stepper motor will run
                     GPIO.output(STEP, GPIO.LOW)
 
                 time.sleep(1)

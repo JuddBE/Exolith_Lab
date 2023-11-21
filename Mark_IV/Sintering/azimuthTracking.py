@@ -25,6 +25,7 @@ class azimuth_tracker:
 
         DIR_1 = int(os.getenv("AZIMUTH_Direction"))  # DIR+
         STEP_1 = int(os.getenv("AZIMUTH_Pulse"))  # PULL+
+        uvMin = float(os.getenv("uvMin"))
 
         # 0/1 used to signify clockwise or counterclockwise.
         CW = direction
@@ -55,12 +56,11 @@ class azimuth_tracker:
             self.logger.logInfo("Adjusting....")
 
             for x in range(steps):
-                print(x)
                 # About 0.5 degrees each 70 motor steps.
                 # 1-50 gear ratio.
                 # Moves about 1 degree every 2.75 seconds.
                 # 16-17 mins to do 360 degree scan.
-                for i in range(70):
+                for i in range(40):
                     # print(i)
                     GPIO.output(STEP_1, GPIO.HIGH)
                     # .5 == super slow
@@ -76,6 +76,9 @@ class azimuth_tracker:
                     uv_high = uv
 
                 self.logger.logUV(uv_high)
+
+                if uv > uvMin:
+                    break
                 sleep(0.3)
 
         # Once finished clean everything up
@@ -127,8 +130,8 @@ class azimuth_tracker:
         global uvLower
         global uvUpper
 
-        uvUpper = uvMax + (uvMax * (0.01))
-        uvLower = uvMax - (uvMax * (0.01))
+        uvUpper = uvMax + (uvMax * (0.04))
+        uvLower = uvMax - (uvMax * (0.04))
 
         self.logger.logInfo("UV Max: " + str(uvMax))
         self.logger.logInfo("UV Upper: " + str(uvUpper))

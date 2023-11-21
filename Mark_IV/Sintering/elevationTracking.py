@@ -41,13 +41,6 @@ class elevation_tracker:
         # Extract the passed data
         year, month, day, hour, minute, second, timezone = when
         latitude, longitude = location
-        print(year)
-        month = 11
-        day = 20
-        print(month)
-        print(day)
-        print(hour)
-        print(minute)
 
         # Math typing shortcuts
         rad, deg = math.radians, math.degrees
@@ -165,18 +158,17 @@ class elevation_tracker:
         degreeDifferenceX = float(currentTiltAngleX) - float(elevation)
 
         try:
-
-            while degreeDifferenceX > accuracy or (degreeDifferenceX * (-1)) > accuracy:
+            while abs(degreeDifferenceX) > accuracy:
 
                 self.logger.logInfo("Adjusting Elevation Angle...")
                 delay = 0.05
                 if abs(degreeDifferenceX) > 1.5:
-                    degreeDev = degreeDifferenceX * 8
+                    degreeDev = abs(degreeDifferenceX) * 8
                 else:
-                    degreeDev = degreeDifferenceX * 4
+                    degreeDev = abs(degreeDifferenceX) * 4
                     delay = 0.2
 
-                degreeDev = math.floor(degreeDev)
+                degreeDev = math.ceil(degreeDev)
 
                 sleep(1.0)
 

@@ -1,10 +1,9 @@
 import RPi.GPIO as GPIO
 import time
 from datetime import date, datetime
-import arrow
 from GPS import GPS_Data
 from Logging import logger
-import axisReset
+import axisReset 
 from sensorGroup import sensor_group
 import os
 from dotenv import load_dotenv
@@ -121,7 +120,6 @@ def solarTracking():
     except KeyboardInterrupt:
         proc.join()
         
-
 
 def main():
     azimuth_status = True  # change to false

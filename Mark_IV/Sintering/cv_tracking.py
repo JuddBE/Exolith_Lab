@@ -15,7 +15,7 @@ def find_correction():
 
     height, width = gray.shape
     mid_width = int(width / 2)
-    mid_height = int(height / 2)
+    mid_height = int(height / 2) 
 
     img = cv2.resize(img, (540,700), interpolation=cv2.INTER_LINEAR)
     cv2.circle(img, maxLoc, 1, 0, 2)
@@ -25,18 +25,17 @@ def find_correction():
     cv2.circle(img, (270 - thresh_pixel, mid_height + thresh_pixel), 1, 0, 2)
     cv2.imshow("Image", img)
     cv2.waitKey(0)
-
-    actions = ["stay", "stay", maxVal]
+    
+    pic_info = ["stay", "stay", maxVal, mid_width - abs(maxLoc[0]), mid_height - abs(maxLoc[1])]
     if mid_width + thresh_pixel < maxLoc[0]:
-        actions[0] = "right"
+        pic_info[0] = "right"
     elif mid_width - thresh_pixel > maxLoc[0]:
-        actions[0] = "left"
+        pic_info[0] = "left"
     if mid_height + thresh_pixel < maxLoc[1]:
-        actions[1] = "down"
+        pic_info[1] = "down"
     elif mid_height - thresh_pixel > maxLoc[1]:
-        actions[1] = "up"
-    print(actions)
-    return actions
+        pic_info[1] = "up"
+    return pic_info
 
 def main():
     find_correction()

@@ -26,7 +26,7 @@ def find_correction():
     cv2.imshow("Image", img)
     cv2.waitKey(0)
     
-    pic_info = ["stay", "stay", maxVal, mid_width - abs(maxLoc[0]), mid_height - abs(maxLoc[1])]
+    pic_info = ["stay", "stay", maxVal, abs(mid_width - maxLoc[0]), abs(mid_height - maxLoc[1])]
     if mid_width + thresh_pixel < maxLoc[0]:
         pic_info[0] = "right"
     elif mid_width - thresh_pixel > maxLoc[0]:

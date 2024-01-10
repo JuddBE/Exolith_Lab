@@ -121,10 +121,11 @@ class azimuth_tracker:
                     az_dir = pic_info[0]
                     elev_dir = pic_info[1]
                     run = True
+                    # Set the azimuth direction.
                     if az_dir == "right":
-                        az_direction = 0
+                        GPIO.output(DIR_1, 0)
                     elif az_dir == "left":
-                        az_direction = 1
+                        GPIO.output(DIR_1, 1)
                     else:
                         run = False
 
@@ -132,24 +133,19 @@ class azimuth_tracker:
                     if elev_dir == "up":
                         run = True
                         GPIO.output(DIR, 1)
-                        for x in range(elev_steps):
-                            GPIO.output(STEP, GPIO.HIGH)
-                            sleep(0.05)  # Dictates how fast stepper motor will run
-                            GPIO.output(STEP, GPIO.LOW)
                     elif elev_dir == "down":
                         run = True
                         GPIO.output(DIR, 0)
+                        
+                    # If neither azimuth or elevation needed to move, exit since it found the sun.
+                    if not run:
+                        return
+                    
+                    if elev_dir != "stay":
                         for x in range(elev_steps):
                             GPIO.output(STEP, GPIO.HIGH)
                             sleep(0.05)  # Dictates how fast stepper motor will run
                             GPIO.output(STEP, GPIO.LOW)
-                    
-                    # If neither azimuth or elevation needed to move, exit since it found the sun.
-                    if not run:
-                        return
-
-                    # Set the azimuth direction.
-                    GPIO.output(DIR_1, az_direction)
                 
                 # Move azimuth as long as the sun is not in the middle of the image.
                 if az_dir != "stay":

@@ -100,21 +100,23 @@ class azimuth_tracker:
                 
                 # Set the initial azimuth and elevation movement step numbers.
                 # When the sun is not in frame, move for these number of steps.
+                min_az_steps = 30
+                min_elev_steps = 4
                 max_az_steps = 300
                 max_elev_steps = 18
                 az_steps = max_az_steps
                 elev_steps = max_elev_steps
 
                 if bright_val >= self.maxVal:
-                    self.logger.logInfo("Sun in frame, adjusting...")
+                    self.logger.logInfo("Sun in frame...")
 
                     # Set number of azimuth and elevations steps to take.
                     # Take more movement steps the farther from the middle of the pic the sun is located.
                     az_steps = round(pic_info[3], 0)
                     elev_steps = round(pic_info[4] / 20, 0)
-                    if az_steps < 30: az_steps = 30
+                    if az_steps < min_az_steps: az_steps = min_az_steps
                     elif az_steps > max_az_steps: az_steps = max_az_steps
-                    if elev_steps < 4: elev_steps = 4
+                    if elev_steps < min_elev_steps: elev_steps = min_elev_steps
                     elif elev_steps > max_elev_steps: elev_steps = max_elev_steps
 
                     # Detemine direction of azimuth and elevation motors.

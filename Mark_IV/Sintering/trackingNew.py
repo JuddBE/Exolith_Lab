@@ -3,6 +3,7 @@ from time import sleep
 from Logging import logger
 from dotenv import load_dotenv
 from cv_tracking import find_correction
+from picamera import PiCamera
 import os 
 
 # Load environment variables from .env file
@@ -10,7 +11,7 @@ load_dotenv()
 
 azVal = None
 
-class azimuth_tracker:
+class tracker:
     def __init__(self):
         self.logger = logger()
         self.maxVal = 20
@@ -32,11 +33,15 @@ class azimuth_tracker:
         # Set the first direction you want it to spin
         GPIO.output(DIR_1, direction)
 
+        camera = PiCamera()
+        camera.start_preview()
+        sleep(3.0)
+
         try:
             self.logger.logInfo("Adjusting....")
 
             for x in range(steps):
-                pic_info = find_correction()
+                pic_info = find_correction(camera)
                 bright_val = pic_info[2]
 
                 if bright_val >= self.maxVal and pic_info[0] == "stay":
@@ -55,11 +60,13 @@ class azimuth_tracker:
                     sleep(0.001)
                 
                 sleep(0.3)
+            camera.stop_preview()
 
         # Once finished clean everything up
         except Exception as e:
             self.logger.logInfo("Step Movement Exception: " + str(e))
             GPIO.cleanup()
+            camera.stop_preview()
 
     def azimuthPositioning(self):
         self.tracking(0)
@@ -91,11 +98,15 @@ class azimuth_tracker:
         # 0/1 used to signify clockwise or counterclockwise.
         GPIO.output(DIR_1, az_direction)
 
+        camera = PiCamera()
+        camera.start_preview()
+        sleep(3.0)
+
         try:
             while True:
                 self.logger.logInfo("Azimuth Adjustment...")
                 
-                pic_info = find_correction()
+                pic_info = find_correction(camera)
                 az_dir = pic_info[0]
                 elev_dir = pic_info[1]
                 bright_val = pic_info[2]
@@ -141,10 +152,9 @@ class azimuth_tracker:
                         
                     # If neither azimuth or elevation needed to move, exit since it found the sun.
                     if not run:
-                        return
+                        break
                     
                     if elev_dir != "stay":
-                        print(elev_steps)
                         for x in range(elev_steps):
                             GPIO.output(STEP, GPIO.HIGH)
                             sleep(0.15)  # Dictates how fast stepper motor will run
@@ -159,12 +169,14 @@ class azimuth_tracker:
                         sleep(0.0011)
                         GPIO.output(STEP_1, GPIO.LOW)
                         sleep(0.0011)
-                # sleep(1.0)
+                sleep(0.5)
+            camera.stop_preview()
 
         # Once finished clean everything up
         except Exception as e:
             self.logger.logInfo("Exception in track: {}".format(e))
             GPIO.cleanup()
+            camera.stop_preview()
 
     # def tracking(self):
     #     os.chdir("/home/pi/Exolith_Lab/Mark_IV/Sintering")
@@ -292,7 +304,7 @@ class azimuth_tracker:
             
 
 def main():
-    at = azimuth_tracker()
+    at = tracker()
     # at.stepMovement(1, 100)
     at.tracking()
 

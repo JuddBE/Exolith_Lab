@@ -61,12 +61,14 @@ class tracker:
                 
                 sleep(0.3)
             camera.stop_preview()
+            camera.close()
 
         # Once finished clean everything up
         except Exception as e:
             self.logger.logInfo("Step Movement Exception: " + str(e))
             GPIO.cleanup()
             camera.stop_preview()
+            camera.close()
 
     def azimuthPositioning(self):
         self.tracking(0)
@@ -114,9 +116,9 @@ class tracker:
                 # Set the initial azimuth and elevation movement step numbers.
                 # When the sun is not in frame, move for these number of steps.
                 min_az_steps = 40
-                min_elev_steps = 4
+                min_elev_steps = 6
                 max_az_steps = 1200
-                max_elev_steps = 16
+                max_elev_steps = 24
                 az_steps = max_az_steps
                 elev_steps = max_elev_steps
 
@@ -125,8 +127,8 @@ class tracker:
 
                     # Set number of azimuth and elevations steps to take.
                     # Take more movement steps the farther from the middle of the pic the sun is located.
-                    az_steps = int(round(pic_info[3] * 6, 0))
-                    elev_steps = int(round(pic_info[4] / 20, 0))
+                    az_steps = int(round(pic_info[3] * 3, 0))
+                    elev_steps = int(round(pic_info[4] / 10, 0))
                     if az_steps < min_az_steps: az_steps = min_az_steps
                     elif az_steps > max_az_steps: az_steps = max_az_steps
                     if elev_steps < min_elev_steps: elev_steps = min_elev_steps
@@ -171,12 +173,14 @@ class tracker:
                         sleep(0.0011)
                 sleep(0.5)
             camera.stop_preview()
+            camera.close()
 
         # Once finished clean everything up
         except Exception as e:
             self.logger.logInfo("Exception in track: {}".format(e))
             GPIO.cleanup()
             camera.stop_preview()
+            camera.close()
 
     # def tracking(self):
     #     os.chdir("/home/pi/Exolith_Lab/Mark_IV/Sintering")

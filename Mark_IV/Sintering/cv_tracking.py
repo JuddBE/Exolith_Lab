@@ -9,10 +9,11 @@ def find_correction(camera):
     resolution = (622, 350)
     # camera = PiCamera()
     camera.resolution = resolution
+    camera.rotation = 270
     # camera.start_preview()
     camera.capture('./imgs/sun.jpg')
     img = cv2.imread('./imgs/sun.jpg', cv2.IMREAD_COLOR)
-    # os.remove("./imgs/sun.jpg")
+
 
     # Convert to grayscale.
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)

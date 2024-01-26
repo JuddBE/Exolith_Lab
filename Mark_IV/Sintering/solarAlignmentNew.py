@@ -3,7 +3,7 @@ import time
 from datetime import date, datetime
 from GPS import GPS_Data
 from Logging import logger
-import axisReset 
+import axisReset
 from sensorGroup import sensor_group
 import os
 from dotenv import load_dotenv
@@ -97,7 +97,7 @@ def solarElevationLogic():
 
 def azimuthLogic():
     try:
-        tracker.stepMovement(1, int(os.getenv("AZIMUTH_Steps")))
+        # tracker.stepMovement(1, int(os.getenv("AZIMUTH_Steps")))
         tracker.tracking()
         return True
 

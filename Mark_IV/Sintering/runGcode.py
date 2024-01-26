@@ -3,16 +3,18 @@ from xMoveCoord import xMoveCoord
 from xyMoveCoord import xyMoveCoord
 from zMoveCoord import zMoveCoord
 from axisReset import axis_reset
+import os
+import sys
 
-def read_gcode():
-    xy_fast = 0.7
-    xy_slow = 0.4
+def read_gcode(file_name="box.gcode"):
+    xy_fast = 0.6
+    xy_slow = 0.1
     z_speed_mod = 0.3
     pause = 1
     count = 0
 
-    file_name = "practice.gcode"
     pause_file_name = "pause.txt"
+    os.chdir("/home/pi/Exolith_Lab/Mark_IV/Sintering")
 
     with open(pause_file_name, "w") as f:
         f.write("1")
@@ -68,7 +70,12 @@ def read_gcode():
                 count += 1
             
 def main():
-    read_gcode()
+    num_args = len(sys.argv)
+    print(num_args)
+    if num_args == 2:
+        read_gcode(sys.argv[1])
+    else:
+        read_gcode()
 
 if __name__ == "__main__":
     main()

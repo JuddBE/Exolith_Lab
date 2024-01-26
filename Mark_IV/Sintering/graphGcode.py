@@ -7,7 +7,7 @@ def graph_gcode():
     y_coords = []
     z_coords = []
 
-    file_name = "practice.gcode"
+    file_name = "box.gcode"
     pause_file_name = "pause.txt"
 
     with open(pause_file_name, "w") as f:

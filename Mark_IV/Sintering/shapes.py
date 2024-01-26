@@ -3,7 +3,7 @@ import sys
 import os
 from xMove import xMove
 from yMove import yMove
-from Sintering.zMoveDeprecated import zMove
+from zMove import zMove
 from xyMove import xyMove
 from xy_curve import xyCurve
 from xyMoveCoord import xyMoveCoord
@@ -96,7 +96,7 @@ def box3d(x_dist=4, y_dist=4, z_dist=4):
             # When of last layer, don't move tray down anymore.
             if i == num_z_lines - 1:
                 break
-            zMove(layer_height, False)
+            zMove(layer_height, True)
             flip = not(flip)
             while(pause != "0"):
                 with open(pause_file_name, "r") as f:
@@ -196,7 +196,7 @@ def cylinder(radius=2, height=3):
             
             # Moves to start next layer.
             # True moves linear actuator forward.
-            zMove(layer_height, False)
+            zMove(layer_height, True)
             if flip:
                 x_coord -= radius
                 y_coord += radius
@@ -236,7 +236,7 @@ def hexagonal_prism(width=5, height=5):
             
             # Moves to start next layer.
             # True moves linear actuator forward.
-            zMove(layer_height, False)
+            zMove(layer_height, True)
             start_out = not(start_out)
             while(pause != "0"):
                 with open(pause_file_name, "r") as f:
@@ -266,7 +266,7 @@ def semi_sphere(radius=4):
             
             # Moves to start next layer.
             # True moves linear actuator forward.
-            zMove(layer_height, False)
+            zMove(layer_height, True)
             start_out = not(start_out)
 
             # Makes next circle smaller.
@@ -308,7 +308,7 @@ def bowl(radius=4):
                 break
             # Moves to start next layer.
             # True moves linear actuator forward.
-            zMove(layer_height, False)
+            zMove(layer_height, True)
             yMove(focal_diameter * (thickness - 1), False, pause=True)
             radius += focal_diameter * (thickness - 1)
             input("Press Enter to continue next layer")
@@ -337,7 +337,7 @@ def main():
             if num_args > 4:
                 box3d(float(sys.argv[2]), float(sys.argv[3]), float(sys.argv[4]))
             else:
-                box3d(x_dist=3, y_dist=3, z_dist=3)
+                box3d(x_dist=2, y_dist=2, z_dist=2)
     else:
         box3d(x_dist=3, y_dist=3, z_dist=3)
         # cylinder(radius=2, height=2)

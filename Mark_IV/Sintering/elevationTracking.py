@@ -128,7 +128,7 @@ class elevation_tracker:
 
         # Should be set by user, either via flag or direct input
         accuracy = 0.3
-        degOffset = -2.2
+        degOffset = 0
 
         # Setup pin layout on RPI
         GPIO.setmode(GPIO.BCM)
@@ -158,14 +158,17 @@ class elevation_tracker:
         degreeDifferenceX = float(currentTiltAngleX) - float(elevation)
 
         try:
-
-            while degreeDifferenceX > accuracy or (degreeDifferenceX * (-1)) > accuracy:
+            while abs(degreeDifferenceX) > accuracy:
 
                 self.logger.logInfo("Adjusting Elevation Angle...")
+                delay = 0.05
+                if abs(degreeDifferenceX) > 1.5:
+                    degreeDev = abs(degreeDifferenceX) * 8
+                else:
+                    degreeDev = abs(degreeDifferenceX) * 4
+                    delay = 0.2
 
-                degreeDev = degreeDifferenceX * (10/3)
-
-                degreeDev = math.floor(degreeDev)
+                degreeDev = math.ceil(degreeDev)
 
                 sleep(1.0)
 
@@ -176,7 +179,7 @@ class elevation_tracker:
 
                 for x in range(int(degreeDev)):
                     GPIO.output(STEP, GPIO.HIGH)
-                    sleep(0.2)  # Dictates how fast stepper motor will run
+                    sleep(delay)  # Dictates how fast stepper motor will run
                     GPIO.output(STEP, GPIO.LOW)
 
                 time.sleep(1)

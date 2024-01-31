@@ -14,7 +14,7 @@ azVal = None
 class tracker:
     def __init__(self):
         self.logger = logger()
-        self.maxVal = 20
+        self.maxVal = 250
  
     def stepMovement(self, direction, steps):
         GPIO.setwarnings(False)
@@ -74,7 +74,7 @@ class tracker:
         self.tracking(0)
         return True
 
-    def tracking(self, az_direction=0):
+    def tracking(self, az_direction=1, firstTime=True):
         os.chdir("/home/pi/Exolith_Lab/Mark_IV/Sintering")
         GPIO.setwarnings(False)
         GPIO.cleanup()
@@ -115,10 +115,10 @@ class tracker:
                 
                 # Set the initial azimuth and elevation movement step numbers.
                 # When the sun is not in frame, move for these number of steps.
-                min_az_steps = 40
-                min_elev_steps = 6
+                min_az_steps = 25
+                min_elev_steps = 5
                 max_az_steps = 1200
-                max_elev_steps = 24
+                max_elev_steps = 40
                 az_steps = max_az_steps
                 elev_steps = max_elev_steps
 
@@ -128,7 +128,7 @@ class tracker:
                     # Set number of azimuth and elevations steps to take.
                     # Take more movement steps the farther from the middle of the pic the sun is located.
                     az_steps = int(round(pic_info[3] * 3, 0))
-                    elev_steps = int(round(pic_info[4] / 10, 0))
+                    elev_steps = int(round(pic_info[4] / 4, 0))
                     if az_steps < min_az_steps: az_steps = min_az_steps
                     elif az_steps > max_az_steps: az_steps = max_az_steps
                     if elev_steps < min_elev_steps: elev_steps = min_elev_steps
@@ -163,7 +163,7 @@ class tracker:
                             GPIO.output(STEP, GPIO.LOW)
                 
                 # Move azimuth as long as the sun is not in the middle of the image.
-                if az_dir != "stay":
+                if az_dir != "stay" and firstTime:
                     for _ in range(az_steps):
                         GPIO.output(STEP_1, GPIO.HIGH)
                         # .5 == super slow

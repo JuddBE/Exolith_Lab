@@ -3,18 +3,19 @@ import time
 from datetime import date, datetime
 from GPS import GPS_Data
 from Logging import logger
-import axisReset 
+import axisReset
 from sensorGroup import sensor_group
 import os
 from dotenv import load_dotenv
 from elevationTracking import elevation_tracker
-from azimuthTracking import azimuth_tracker
+# from azimuthTracking import azimuth_tracker
+from trackingNew import tracker
 import multiprocessing as mp
 
 load_dotenv()
 logger = logger()
 elevation_tracker = elevation_tracker()
-azimuth_tracker = azimuth_tracker()
+tracker = tracker()
 gps = GPS_Data()
 
 
@@ -44,24 +45,22 @@ def axisResets():
 
 def sensorGroupCheck():
     sg = sensor_group()
-    light_sensor_status = False
     orientation_sensor_status = False
 
     try:
-        light_sensor_status = sg.light_sensor_health()
         orientation_sensor_status = sg.orientation_sensor_health()
 
     except Exception as e:
         logger.logInfo("Sensor Group Failure: {}".format(e))
 
-    if light_sensor_status and orientation_sensor_status:
+    if orientation_sensor_status:
         logger.logInfo("Sensor Group Healthy")
         return True
 
     else:
         logger.logInfo(
-            "Sensor Group Failure: light_sensor_status: {} \norientation_sensor_status: {}".format(
-                light_sensor_status, orientation_sensor_status
+            "Sensor Group Failure: orientation_sensor_status: {}".format(
+                orientation_sensor_status
             )
         )
         return False
@@ -90,18 +89,16 @@ def solarElevationLogic():
     logger.logInfo("Current UTC: {}".format(now))
 
     status = elevation_tracker.solarElevationPositioning(elevation)
+    status = True
 
     return status
 
 
 def azimuthLogic():
-    azimuth_status = False
-
     try:
-        azimuth_tracker.stepMovement(1, int(os.getenv("AZIMUTH_Steps")))
-        uvMax = azimuth_tracker.maxValue()
-        azimuth_status = azimuth_tracker.azimuthPositioning(uvMax)
-        return azimuth_status
+        # tracker.stepMovement(1, int(os.getenv("AZIMUTH_Steps")))
+        tracker.tracking(True)
+        return True
 
     except Exception as e:
         logger.logInfo("Azimuth Logic Failure {}".format(e))
@@ -111,14 +108,12 @@ def azimuthLogic():
 def solarTracking():
     logger.logInfo("Solar Tracking......")
     try:
-        proc = mp.Process(target=azimuth_tracker.tracking)
-        proc.start()
         while True:
-            solarElevationLogic()
+            tracker.tracking(False)
             time.sleep(1)
 
     except KeyboardInterrupt:
-        proc.join()
+        logger.logInfo("Tracking Terminated")
         
 
 def main():
@@ -126,10 +121,6 @@ def main():
     sensorStatus = False
 
     os.chdir("/home/pi/Exolith_Lab/Mark_IV/Sintering")
-    uv_file = "uv_current.txt"
-    with open(uv_file, "w") as f:
-        f.write("0")
-
     logger.logInfo("Step 1: Checking sensor health")
 
     # Need to add fail flag to prevent endless loop on failure
@@ -139,7 +130,8 @@ def main():
     if sensorStatus:
         logger.logInfo("Step 2: Solar Elevation Logic, Solar Azimuth Logic")
 
-        solar_elevation_status = solarElevationLogic()
+        # solar_elevation_status = solarElevationLogic()
+        solar_elevation_status = True
         azimuth_status = azimuthLogic()
 
         if solar_elevation_status:
@@ -169,8 +161,4 @@ def main():
 
 
 if __name__ == "__main__":
-
-    if os.path.exists("uvsensor.txt"):
-        os.remove("uvsensor.txt")
-
     main()

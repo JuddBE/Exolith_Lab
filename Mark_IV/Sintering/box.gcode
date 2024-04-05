@@ -14,7 +14,6 @@ M104 S270
 M105
 M109 S270
 M82 ;absolute extrusion mode
-G28 ;Home
 G1 Z15.0 F6000 ;Move the platform down 15mm
 ;Prime the extruder
 G92 E0

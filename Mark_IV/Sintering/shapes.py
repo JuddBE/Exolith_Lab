@@ -19,8 +19,8 @@ y_file_name = "y_coord.txt"
 pause_file_name = "pause.txt"
 
 # Defines the diameter of the focal point in cm.
-layer_height = 0.3
-focal_diameter = 0.7
+
+focal_diameter = 0.6
 
 # For sintering use 0.1 as default
 speed = 0.1
@@ -48,6 +48,10 @@ def box2d(x_dist=3, y_dist=3, flip=False, x_prev_dir=True, y_prev_dir=True, spee
     try:
         # Make box with given number of lines.
         if(flip):
+            xMove(x_dist, x_prev_dir, speed_mod, pause=True)
+            yMove(y_dist, y_prev_dir, speed_mod, pause=True)
+            xMove(x_dist, not x_prev_dir, speed_mod, pause=True)
+            yMove(y_dist, not y_prev_dir, speed_mod, pause=True)
             for i in range(num_lines):
                 yMove(y_dist, y_prev_dir, speed_mod, pause=True)
                 y_prev_dir = not(y_prev_dir)
@@ -55,9 +59,12 @@ def box2d(x_dist=3, y_dist=3, flip=False, x_prev_dir=True, y_prev_dir=True, spee
                     break
                 
                 xMove(focal_diameter, x_prev_dir, speed_mod, pause=True)
-                # xMove(x_dist, x_prev_dir, speed, pause=True)
             x_prev_dir = not(x_prev_dir)
         else:
+            xMove(x_dist, x_prev_dir, speed_mod, pause=True)
+            yMove(y_dist, y_prev_dir, speed_mod, pause=True)
+            xMove(x_dist, not x_prev_dir, speed_mod, pause=True)
+            yMove(y_dist, not y_prev_dir, speed_mod, pause=True)            
             for i in range(num_lines):
                 xMove(x_dist, x_prev_dir, speed_mod, pause=True)
                 x_prev_dir = not(x_prev_dir)
@@ -65,11 +72,8 @@ def box2d(x_dist=3, y_dist=3, flip=False, x_prev_dir=True, y_prev_dir=True, spee
                     break
 
                 yMove(focal_diameter, y_prev_dir, speed_mod, pause=True)
-                # yMove(y_dist, y_prev_dir, speed, pause=True)
             y_prev_dir = not(y_prev_dir)
         return (x_prev_dir, y_prev_dir)
-                
-
 
     # Once finished clean everything up
     except KeyboardInterrupt:
@@ -77,7 +81,7 @@ def box2d(x_dist=3, y_dist=3, flip=False, x_prev_dir=True, y_prev_dir=True, spee
         GPIO.cleanup()
     
 
-def box3d(x_dist=4, y_dist=4, z_dist=4):
+def box3d(x_dist=4, y_dist=4, z_dist=4, layer_height=0.14):
     x_prev_dir = True
     y_prev_dir = True
     pause = "1"
@@ -111,12 +115,12 @@ def box3d(x_dist=4, y_dist=4, z_dist=4):
         GPIO.cleanup()
 
 
-def circle(radius=2, flip=False):
+def circle(radius=1, flip=False):
     try:
         if not(flip):
-            xyCurve(0, 0, 0, radius, True, speed_mod=speed, pause=True)
+            xyCurve(0, 0, 0, radius, True, speed_mod=speed / 1.5, pause=True)
         else:
-            xyCurve(0, 0, radius, 0, True, speed_mod=speed, pause=True)
+            xyCurve(0, 0, radius, 0, True, speed_mod=speed / 1.5, pause=True)
         xyCircleFill(radius, speed_mod=speed, flip=flip)
 
     except KeyboardInterrupt:
@@ -162,7 +166,7 @@ def hexagon(width=3, start_out=False):
         GPIO.cleanup()
 
 
-def cylinder(radius=2, height=3):
+def cylinder(radius=2, height=3, layer_height=0.14):
     # Rounds the dimensions to the nearest multiple of the focal point's diameter.
     num_layers = int(round(height / layer_height, 0))
     flip = False
@@ -218,7 +222,7 @@ def cylinder(radius=2, height=3):
         GPIO.cleanup()
 
 
-def hexagonal_prism(width=5, height=5):
+def hexagonal_prism(width=5, height=5, layer_height=0.14):
     # Rounds the dimensions to the nearest multiple of the focal point's diameter.
     num_layers = int(round(height / layer_height, 0))
     start_out = True
@@ -251,7 +255,7 @@ def hexagonal_prism(width=5, height=5):
         GPIO.cleanup()
 
 
-def semi_sphere(radius=4):
+def semi_sphere(radius=4, layer_height=0.14):
     # Rounds the dimensions to the nearest multiple of the focal point's diameter.
     num_layers = int(round(radius / focal_diameter, 0))
     start_out = True
@@ -259,7 +263,7 @@ def semi_sphere(radius=4):
     try:
         for i in range(num_layers):
             # Traces filled-in circle.
-            circle(radius, start_out)
+            circle(radius)
 
             if i == num_layers - 1:
                 break
@@ -284,7 +288,7 @@ def semi_sphere(radius=4):
         GPIO.cleanup()
 
 
-def bowl(radius=4):
+def bowl(radius=4, layer_height=0.14):
     # Thickness defines how many layers thick the bowl will be.
     thickness = 3
     num_layers = int(round(radius / focal_diameter, 0))
@@ -325,21 +329,25 @@ def main():
         if sys.argv[1].lower() == "hexagon":
             hexagon(width=3, start_out=True)
         if sys.argv[1].lower() == "circle":
-            circle(radius=2, start_out=True)
+            circle(radius=2)
         if sys.argv[1].lower() == "box2d":
             box2d(x_dist=3, y_dist=3)
         if sys.argv[1].lower() == "cylinder":
-            if num_args > 3:
+            if num_args > 4:
+                cylinder(float(sys.argv[2]), float(sys.argv[3]), float(sys.argv[4]))
+            elif num_args > 3:
                 cylinder(float(sys.argv[2]), float(sys.argv[3]))
             else:
-                cylinder(radius=2, height=2)
+                cylinder(radius=1.2, height=0.48)
         if sys.argv[1].lower() == "box3d":
-            if num_args > 4:
+            if num_args > 5:
+                box3d(float(sys.argv[2]), float(sys.argv[3]), float(sys.argv[4]), float(sys.argv[5]))
+            elif num_args > 4:
                 box3d(float(sys.argv[2]), float(sys.argv[3]), float(sys.argv[4]))
             else:
-                box3d(x_dist=2, y_dist=2, z_dist=2)
+                box3d(x_dist=4, y_dist=4, z_dist=2)
     else:
-        box3d(x_dist=3, y_dist=3, z_dist=3)
+        box3d(x_dist=2, y_dist=2, z_dist=4)
         # cylinder(radius=2, height=2)
         # hexagonal_prism(width=3, height=3)
         # semi_sphere(radius=2)

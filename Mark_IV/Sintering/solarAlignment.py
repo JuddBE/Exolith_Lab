@@ -1,22 +1,19 @@
 import RPi.GPIO as GPIO
 import time
-from datetime import date, datetime
-from GPS import GPS_Data
+# from GPS import GPS_Data
 from Logging import logger
 import axisReset
 from sensorGroup import sensor_group
 import os
 from dotenv import load_dotenv
 from elevationTracking import elevation_tracker
-# from azimuthTracking import azimuth_tracker
 from trackingNew import tracker
-import multiprocessing as mp
 
 load_dotenv()
 logger = logger()
 elevation_tracker = elevation_tracker()
 tracker = tracker()
-gps = GPS_Data()
+# gps = GPS_Data()
 
 
 def axisResets():
@@ -46,6 +43,7 @@ def axisResets():
 def sensorGroupCheck():
     sg = sensor_group()
     orientation_sensor_status = False
+    # orientation_sensor_status = True
 
     try:
         orientation_sensor_status = sg.orientation_sensor_health()
@@ -67,28 +65,29 @@ def sensorGroupCheck():
 
 
 def solarElevationLogic():
-    if(os.getenv("useGPS") == "True"):
-        gps_dict = gps.getCurrentCoordinates()
-    else:
-        gps_dict = gps.userDefinedCoordinates()
+    # if(os.getenv("useGPS") == "True"):
+    #     gps_dict = gps.getCurrentCoordinates()
+    # else:
+    #     gps_dict = gps.userDefinedCoordinates()
+    # gps_dict = gps.userDefinedCoordinates()
     
-    today, year, day, month = gps.getDate()
+    # today, year, day, month = gps.getDate()
 
-    now, hour, minutes, seconds = gps.getTime()
+    # now, hour, minutes, seconds = gps.getTime()
 
-    if gps_dict["Longitude Direction"] == "W":
-        longitude = -gps_dict["Longitude"]
-    else:
-        longitude = gps_dict["Longitude"]
+    # if gps_dict["Longitude Direction"] == "W":
+    #     longitude = -gps_dict["Longitude"]
+    # else:
+    #     longitude = gps_dict["Longitude"]
 
-    location = (gps_dict["Lattitude"], longitude) 
-    when = (year, month, day, int(hour), int(minutes), int(seconds), 0)
+    # location = (gps_dict["Lattitude"], longitude) 
+    # when = (year, month, day, int(hour), int(minutes), int(seconds), 0)
 
-    azimuth, elevation = elevation_tracker.sunpos(when, location, True)
+    # azimuth, elevation = elevation_tracker.sunpos(when, location, True)
 
-    logger.logInfo("Current UTC: {}".format(now))
+    # logger.logInfo("Current UTC: {}".format(now))
 
-    status = elevation_tracker.solarElevationPositioning(elevation)
+    status = elevation_tracker.solarElevationPositioning(60.0)
     status = True
 
     return status
@@ -96,8 +95,7 @@ def solarElevationLogic():
 
 def azimuthLogic():
     try:
-        # tracker.stepMovement(1, int(os.getenv("AZIMUTH_Steps")))
-        tracker.tracking(True)
+        tracker.tracking(firstTime=True)
         return True
 
     except Exception as e:
@@ -109,7 +107,7 @@ def solarTracking():
     logger.logInfo("Solar Tracking......")
     try:
         while True:
-            tracker.tracking(False)
+            tracker.tracking(firstTime=False)
             time.sleep(1)
 
     except KeyboardInterrupt:
@@ -130,8 +128,8 @@ def main():
     if sensorStatus:
         logger.logInfo("Step 2: Solar Elevation Logic, Solar Azimuth Logic")
 
-        # solar_elevation_status = solarElevationLogic()
-        solar_elevation_status = True
+        solar_elevation_status = solarElevationLogic()
+        # solar_elevation_status = True
         azimuth_status = azimuthLogic()
 
         if solar_elevation_status:

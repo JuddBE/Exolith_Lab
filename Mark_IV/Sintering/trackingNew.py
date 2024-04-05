@@ -14,7 +14,7 @@ azVal = None
 class tracker:
     def __init__(self):
         self.logger = logger()
-        self.maxVal = 250
+        self.maxVal = 200
  
     def stepMovement(self, direction, steps):
         GPIO.setwarnings(False)
@@ -161,9 +161,11 @@ class tracker:
                             GPIO.output(STEP, GPIO.HIGH)
                             sleep(0.15)  # Dictates how fast stepper motor will run
                             GPIO.output(STEP, GPIO.LOW)
+                elif not firstTime:
+                    break
                 
                 # Move azimuth as long as the sun is not in the middle of the image.
-                if az_dir != "stay" and firstTime:
+                if az_dir != "stay" :
                     for _ in range(az_steps):
                         GPIO.output(STEP_1, GPIO.HIGH)
                         # .5 == super slow

@@ -1,11 +1,9 @@
 import RPi.GPIO as GPIO
 from time import sleep
 from Limit_Switches import limitSwitches
-import time
 from dotenv import load_dotenv
 import os
 import sys
-from azimuthTracking import azimuth_tracker
 
 # Load environment variables from .env file
 load_dotenv()

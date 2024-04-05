@@ -5,7 +5,6 @@ import time
 from dotenv import load_dotenv
 import os
 import sys
-from azimuthTracking import azimuth_tracker
 
 # Load environment variables from .env file
 load_dotenv()
@@ -16,7 +15,7 @@ Moves both motor 1 and motor 2 of the X axis. Currently CW || 0 moves the x axis
 
 ls = limitSwitches()
 
-def xMove(distance=10, clockwise=True, speed_mod=0.6, pause=False):
+def xMove(distance=10, clockwise=True, speed_mod=0.6, pause=True):
     GPIO.setwarnings(False)
 
     if speed_mod > 1:
@@ -32,7 +31,7 @@ def xMove(distance=10, clockwise=True, speed_mod=0.6, pause=False):
     # Direction pin from controller
     DIR = int(os.getenv("MOTOR_X_Direction"))  # DIR+
     STEP = int(os.getenv("MOTOR_X_Pulse"))  # PULL+
-    uvMin = float(os.getenv("uvMin"))
+    pixMin = float(os.getenv("pixMin"))
     useGPS = os.getenv("useGPS")
 
     # Max x coordinate in cm
@@ -43,8 +42,8 @@ def xMove(distance=10, clockwise=True, speed_mod=0.6, pause=False):
     CCW = 1
     motor_flag = 0
     x_coord = 0.0
+    brightness_file_name = "brightness_val.txt"
     x_file_name = "x_coord.txt"
-    uv_file_name = "uv_current.txt"
     os.chdir("/home/pi/Exolith_Lab/Mark_IV/Sintering")
 
     # Based on distance traveled each step of the motor in cm.
@@ -78,26 +77,26 @@ def xMove(distance=10, clockwise=True, speed_mod=0.6, pause=False):
         f = open(x_file_name, "w")
         f.write(str(x_coord) + "\n")
         f.seek(0)
-        uv_file = open(uv_file_name, "r+")
+        brightness_file = open(brightness_file_name, "r+")
         # # Run for 200 steps. This will change based on how you set you controller
         for x in range(num_steps):
             if pause and useGPS == "True":
                 if x % 50 == 0:
-                    uvVal = uv_file.readline()
-                    if uvVal != "":
-                        uvVal = float(uvVal)
+                    pixVal = brightness_file.readline()
+                    if pixVal != "":
+                        pixVal = float(pixVal)
                     else:
-                        uvVal = uvVal = uvMin
-                    uv_file.seek(0)
+                        pixVal = pixMin
+                    brightness_file.seek(0)
 
-                while(uvVal < uvMin):
+                while(pixVal < pixMin):
                     time.sleep(0.01)
-                    uvVal = uv_file.readline()
-                    if uvVal != "":
-                        uvVal = float(uvVal)
+                    pixVal = brightness_file.readline()
+                    if pixVal != "":
+                        pixVal = float(pixVal)
                     else:
-                        uvVal = 0
-                    uv_file.seek(0)
+                        pixVal = 0
+                    brightness_file.seek(0)
 
             if x_coord + increment > X_MAX and clockwise:
                 print("X Coordinate out of bounds")

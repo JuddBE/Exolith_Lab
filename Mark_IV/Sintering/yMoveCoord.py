@@ -31,7 +31,7 @@ def yMoveCoord(coord=5, speed_mod=0.6, pause=False):
     # Direction pin from controller
     DIR = int(os.getenv("MOTOR_Y_Direction")) #DIR+
     STEP = int(os.getenv("MOTOR_Y_Pulse")) #PULL+
-    uvMin = float(os.getenv("uvMin"))
+    pixMin = float(os.getenv("pixMin"))
     useGPS = os.getenv("useGPS")
 
     # Max y coordinate in cm
@@ -43,7 +43,7 @@ def yMoveCoord(coord=5, speed_mod=0.6, pause=False):
     motor_flag = 0
     y_coord = 0.0
     file_name = "y_coord.txt"
-    uv_file_name = "uv_current.txt"
+    brightness_file_name = "brightness_val.txt"
     os.chdir("/home/pi/Exolith_Lab/Mark_IV/Sintering")
 
     # Based on distance traveled each step of the motor.
@@ -87,26 +87,26 @@ def yMoveCoord(coord=5, speed_mod=0.6, pause=False):
         f = open(file_name, "w")
         f.write(str(y_coord) + "\n")
         f.seek(0)
-        uv_file = open(uv_file_name, "r+")
+        brightness_file = open(brightness_file_name, "r+")
         # # Run for 200 steps. This will change based on how you set you controller
         for x in range(num_steps):
             if pause and useGPS == "True":
                 if x % 50 == 0:
-                    uvVal = uv_file.readline()
-                    if uvVal != "":
-                        uvVal = float(uvVal)
+                    pixVal = brightness_file.readline()
+                    if pixVal != "":
+                        pixVal = float(pixVal)
                     else:
-                        uvVal = uvVal = uvMin
-                    uv_file.seek(0)
+                        pixVal = pixMin
+                    brightness_file.seek(0)
 
-                while(uvVal < uvMin):
+                while(pixVal < pixMin):
                     time.sleep(0.01)
-                    uvVal = uv_file.readline()
-                    if uvVal != "":
-                        uvVal = float(uvVal)
+                    pixVal = brightness_file.readline()
+                    if pixVal != "":
+                        pixVal = float(pixVal)
                     else:
-                        uvVal = 0
-                    uv_file.seek(0)
+                        pixVal = 0
+                    brightness_file.seek(0)
 
             if y_coord + increment > Y_MAX and increment > 0:
                 print("Y Coordinate out of bounds")

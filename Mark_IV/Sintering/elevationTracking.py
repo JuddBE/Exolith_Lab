@@ -8,6 +8,8 @@ from time import sleep
 from Logging import logger
 from dotenv import load_dotenv
 import os
+from picamera import PiCamera
+from cv_tracking import find_correction
 import inspect
 
 # Load environment variables from .env file
@@ -127,22 +129,13 @@ class elevation_tracker:
         CCW = 0
 
         # Should be set by user, either via flag or direct input
-        accuracy = 0.3
+        accuracy = 1.0
         degOffset = 0
 
         # Setup pin layout on RPI
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(DIR, GPIO.OUT)
         GPIO.setup(STEP, GPIO.OUT)
-
-        # GPIO.output(DIR, CW)
-
-        # for x in range(1000):
-        #     GPIO.output(STEP, GPIO.HIGH)
-        #     sleep(0.02)  # Dictates how fast stepper motor will run
-        #     GPIO.output(STEP, GPIO.LOW)
-
-        # time.sleep(1)
 
         currentTiltAngleX, currentTiltAngleY = self.tiltAngle()
 
@@ -157,8 +150,20 @@ class elevation_tracker:
 
         degreeDifferenceX = float(currentTiltAngleX) - float(elevation)
 
+        camera = PiCamera()
+        camera.start_preview()
+        sleep(3.0)
+
         try:
             while abs(degreeDifferenceX) > accuracy:
+                
+                # check if sun is in frame
+                pic_info = find_correction(camera)
+                
+                # check max pixel brightness
+                if pic_info[2] >= 200:
+                    self.logger.logInfo("Sun in frame...")
+                    break
 
                 self.logger.logInfo("Adjusting Elevation Angle...")
                 delay = 0.05
@@ -169,8 +174,8 @@ class elevation_tracker:
                     delay = 0.2
 
                 degreeDev = math.ceil(degreeDev)
-
-                sleep(1.0)
+                if degreeDev > 160:
+                    degreeDev = 160
 
                 if degreeDifferenceX > 0:
                     GPIO.output(DIR, CW)
@@ -182,7 +187,7 @@ class elevation_tracker:
                     sleep(delay)  # Dictates how fast stepper motor will run
                     GPIO.output(STEP, GPIO.LOW)
 
-                time.sleep(1)
+                sleep(1)
 
                 # New Angle Readings
                 currentTiltAngleX, currentTiltAngleY = self.tiltAngle()
@@ -193,9 +198,13 @@ class elevation_tracker:
                 degreeDifferenceX = float(currentTiltAngleX) - float(elevation)
 
             self.logger.logInfo("Elevation Angle Reached, Stopping Adjustment")
+            camera.stop_preview()
+            camera.close()
             return True
 
         except Exception as e:
+            camera.stop_preview()
+            camera.close()
             self.logger.logInfo("Failure: {}".format(e))
             GPIO.cleanup()
             return False

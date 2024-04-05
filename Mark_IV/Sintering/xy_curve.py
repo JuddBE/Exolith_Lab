@@ -30,12 +30,10 @@ def xyCurve(x_dist=0, y_dist=0, x_circle=0, y_circle=3, rotation=True, speed_mod
 
     # Pin setup
     x1_motor_switch = int(os.getenv("limitSwitchX_1"))
-    x2_motor_switch = int(os.getenv("limitSwitchX_2"))
     y1_motor_switch = int(os.getenv("limitSwitchY_1"))
     y2_motor_switch = int(os.getenv("limitSwitchY_2"))
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(x1_motor_switch,GPIO.IN,pull_up_down=GPIO.PUD_UP)    
-    GPIO.setup(x2_motor_switch,GPIO.IN,pull_up_down=GPIO.PUD_UP)
     GPIO.setup(y1_motor_switch,GPIO.IN,pull_up_down=GPIO.PUD_UP)    
     GPIO.setup(y2_motor_switch,GPIO.IN,pull_up_down=GPIO.PUD_UP)
 
@@ -102,7 +100,7 @@ def xyCurve(x_dist=0, y_dist=0, x_circle=0, y_circle=3, rotation=True, speed_mod
         yProc.join()
 
         # Stop circle if any limit switches are activated.
-        if GPIO.input(y2_motor_switch) == 0 or GPIO.input(y1_motor_switch) == 0 or GPIO.input(x2_motor_switch) == 0 or GPIO.input(x1_motor_switch) == 0:
+        if GPIO.input(y2_motor_switch) == 0 or GPIO.input(y1_motor_switch) == 0 or GPIO.input(x1_motor_switch) == 0:
             motor_flag += 1
         else:
             motor_flag = 0

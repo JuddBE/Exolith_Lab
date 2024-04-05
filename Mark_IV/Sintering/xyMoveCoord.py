@@ -28,7 +28,13 @@ def xyMoveCoord(x_coord=5, y_coord=5, speed_mod=0.5, pause=False):
     # Decides which axis with move at max speed (1), and which will be slowed down.
     # max_dist = max(x_dist, y_dist, z_dist)
     max_dist = max(x_dist, y_dist)
-    if x_dist == max_dist:
+    if x_dist == 0:
+        y_speed_mod = speed_mod
+        x_speed_mod = 0
+    elif y_dist == 0:
+        x_speed_mod = speed_mod
+        y_speed_mod = 0
+    elif x_dist == max_dist:
         y_speed_mod = (y_dist / x_dist) * y_speed_mod
     elif y_dist == max_dist:
         x_speed_mod = (x_dist / y_dist) * x_speed_mod

@@ -87,7 +87,7 @@ def solarElevationLogic():
 
     # logger.logInfo("Current UTC: {}".format(now))
 
-    status = elevation_tracker.solarElevationPositioning(60.0)
+    status = elevation_tracker.solarElevationPositioning(75.0)
     status = True
 
     return status

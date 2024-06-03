@@ -1,5 +1,6 @@
 import cv2
 import os
+import numpy as np
 from time import sleep
 # from picamera import PiCamera
 
@@ -12,8 +13,10 @@ def find_correction():
     # camera.rotation = 270
     # # camera.start_preview()
     # camera.capture('./imgs/sun.jpg')
-    img = cv2.imread('./imgs/sun.jpg', cv2.IMREAD_COLOR)
+    img = cv2.imread('./Mark_IV/Sintering/imgs/sun_middle.jpg', cv2.IMREAD_COLOR)
 
+    # Convert to hsv for color filtering
+    # hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
     # Convert to grayscale.
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -36,6 +39,17 @@ def find_correction():
 
     img = cv2.resize(img, resolution, interpolation=cv2.INTER_LINEAR)
     img = img[:,130:492]
+
+    # # Mask for orange light (the sun)
+    # lower_orange = np.array([5,50,50])
+    # upper_orange = np.array([10,255,255])
+    # color_mask = cv2.inRange(hsv, lower_orange, upper_orange)
+    # cv2.imshow("mask", color_mask)
+    # cv2.waitKey(0)
+
+    # # Bitwise-AND mask and original image
+    # res = cv2.bitwise_and(img, img, mask=color_mask)
+
     cv2.circle(img, maxLoc, 1, 0, 2)
     cv2.circle(img, (mid_width - thresh_pixel + azim_offset, resolution[1] // 2 - thresh_pixel + elev_offset), 1, 0, 2)
     cv2.circle(img, (mid_width + thresh_pixel + azim_offset, resolution[1] // 2 + thresh_pixel + elev_offset), 1, 0, 2)

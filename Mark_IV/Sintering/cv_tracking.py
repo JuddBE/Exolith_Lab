@@ -46,9 +46,9 @@ def find_correction():
     gray = cv2.GaussianBlur(gray, (31, 31), 0)
     (_, _, _, maxLoc) = cv2.minMaxLoc(gray)
  
-    # brightness_file_name = "brightness_val.txt"
-    # with open(brightness_file_name, "w") as f:
-    #     f.write(str(maxVal))
+    brightness_file_name = "brightness_val.txt"
+    with open(brightness_file_name, "w") as f:
+        f.write(str(maxVal))
 
     height, width = gray.shape
     mid_width = int(width / 2)

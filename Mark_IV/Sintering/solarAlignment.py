@@ -7,7 +7,7 @@ from sensorGroup import sensor_group
 import os
 from dotenv import load_dotenv
 from elevationTracking import elevation_tracker
-from trackingNew import tracker
+from azimuthElevationTracking import tracker
 
 load_dotenv()
 logger = logger()

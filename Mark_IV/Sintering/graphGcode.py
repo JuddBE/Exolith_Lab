@@ -12,7 +12,7 @@ def graph_gcode():
 
     with open(pause_file_name, "w") as f:
         f.write("1")
-    with open(file_name, "r") as f:
+    with open("./gcode/" + file_name, "r") as f:
         for line in f:
             if "G0" in line or "G1" in line:
                 x = -1

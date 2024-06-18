@@ -6,7 +6,7 @@ from axisReset import axis_reset
 import os
 import sys
 
-def read_gcode(file_name="Cube32mm.gcode", layer_height=0.155):
+def read_gcode(file_name="Cube32mm.gcode", layer_height=0.15):
     current_layer = 0
     start_coord = [5, 5, 1.4]
     x_offset = 0.0
@@ -50,7 +50,7 @@ def read_gcode(file_name="Cube32mm.gcode", layer_height=0.155):
         f.write("1")
 
     # Read gcode file and interpret instructions
-    with open(file_name, "r") as f:
+    with open("./gcode/" + file_name, "r") as f:
         for line in f:
             light_pause = True
             if "G0" in line:

@@ -2,9 +2,11 @@ from solarAlignment import main as Alignment
 from axisReset import axis_reset
 from shapes import box2d
 import multiprocessing as mp
+import os
 import time
 
 def main():
+    os.chdir("/home/pi/Exolith_Lab/Mark_IV/Sintering")
     # Max distance for x and y axis on each rod, in cm.
     X_MAX = 27
     Y_MAX = 20

@@ -13,9 +13,11 @@ load_dotenv()
 logger = logger()
 elevation_tracker = elevation_tracker()
 tracker = tracker()
+
+# Not needed unless date is used again in the future
 # gps = GPS_Data()
 
-
+# Reset the elevation, azimuth does not need resetting
 def axisResets():
     ar = axisReset.axis_reset()
     ev_status = False
@@ -39,11 +41,10 @@ def axisResets():
         )
         return False
 
-
+# Checks that orientation sensor (and any others that may be added) are connected properly.
 def sensorGroupCheck():
     sg = sensor_group()
     orientation_sensor_status = False
-    # orientation_sensor_status = True
 
     try:
         orientation_sensor_status = sg.orientation_sensor_health()
@@ -63,8 +64,9 @@ def sensorGroupCheck():
         )
         return False
 
-
+# Set initial elevation angle
 def solarElevationLogic():
+    # Commented code relies on current date, and the pi requires wifi to update its current date and time.
     # if(os.getenv("useGPS") == "True"):
     #     gps_dict = gps.getCurrentCoordinates()
     # else:
@@ -87,12 +89,13 @@ def solarElevationLogic():
 
     # logger.logInfo("Current UTC: {}".format(now))
 
+    # Since clock does not work, set elevation and have it interupt when the sun is in camera's view.
     status = elevation_tracker.solarElevationPositioning(75.0)
     status = True
 
     return status
 
-
+# Scan until sun is in frame for the first time.
 def azimuthLogic():
     try:
         tracker.tracking(firstTime=True)
@@ -102,7 +105,7 @@ def azimuthLogic():
         logger.logInfo("Azimuth Logic Failure {}".format(e))
         return False
 
-
+# After sun is in frame, track it by keeping it in a certain area of the frame.
 def solarTracking():
     logger.logInfo("Solar Tracking......")
     try:
@@ -113,33 +116,33 @@ def solarTracking():
     except KeyboardInterrupt:
         logger.logInfo("Tracking Terminated")
         
-
+# 
 def main():
-    azimuth_status = True  # change to false
+    azimuth_status = False
     sensorStatus = False
 
     os.chdir("/home/pi/Exolith_Lab/Mark_IV/Sintering")
     logger.logInfo("Step 1: Checking sensor health")
 
-    # Need to add fail flag to prevent endless loop on failure
+    # Solar alignment does not start until sensors are responding
     while not sensorStatus:
         sensorStatus = sensorGroupCheck()
 
     if sensorStatus:
         logger.logInfo("Step 2: Solar Elevation Logic, Solar Azimuth Logic")
 
+        # Set initial elevation
         solar_elevation_status = solarElevationLogic()
-        # solar_elevation_status = True
+
+        # Scan and find sun for first time
         azimuth_status = azimuthLogic()
 
-        if solar_elevation_status:
-            pass
-
-        else:
+        if not solar_elevation_status:
             logger.logInfo(
                 "Solar Elevation Status Failure: {}".format(solar_elevation_status)
             )
 
+        # If elevation and azimuth are set and sun is in frame, track it.
         if solar_elevation_status and azimuth_status:
             logger.logInfo("Step 3: Solar Tracking")
             solarTracking()

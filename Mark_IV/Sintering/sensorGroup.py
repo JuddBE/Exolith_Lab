@@ -1,33 +1,11 @@
 import smbus
-import board
-import adafruit_ltr390
-import os
 
 class sensor_group:
     def __init__(self):
         pass
-
-    def light_sensor_health(self):
-        # setup I2C bus using board default
-        i2c = board.I2C()  
-        sensor = adafruit_ltr390.LTR390(i2c)
-        uvAverage = 0
-
-        for i in range(10):
-            UV = sensor.uvi
-            uvIndex = UV
-            uvAverage += uvIndex
-
-        uvAverage = uvAverage/10
-
-        if uvAverage / 10 > 0:
-            return True
-        else:
-            return False
-
+    
+    # Check that orientation sensor responds
     def orientation_sensor_health(self):
-
-   
         PWR_MGMT_1 = 0x6B
         SMPLRT_DIV = 0x19
         CONFIG = 0x1A

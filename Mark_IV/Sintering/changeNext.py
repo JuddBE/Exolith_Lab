@@ -5,7 +5,7 @@ Script used by desktop app to start next print layer.
 """
 
 def main():
-    directory = "./Exolith_Lab/Mark_IV/Sintering/"
+    directory = "./Exolith_Lab/Mark_IV/Sintering/txtfiles/"
     pause_file_name = "pause.txt"
     num_args = len(sys.argv)
     if num_args == 2:

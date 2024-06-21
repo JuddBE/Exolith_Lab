@@ -5,6 +5,10 @@ import multiprocessing as mp
 import os
 import time
 
+"""
+Used by the desktop app to sinter the entire printing bed for agglutinates.
+"""
+
 def main():
     os.chdir("/home/pi/Exolith_Lab/Mark_IV/Sintering")
     # Max distance for x and y axis on each rod, in cm.

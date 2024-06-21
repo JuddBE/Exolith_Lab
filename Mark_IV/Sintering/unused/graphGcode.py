@@ -7,12 +7,12 @@ def graph_gcode():
     y_coords = []
     z_coords = []
 
-    file_name = "Cube.gcode"
-    pause_file_name = "pause.txt"
+    file_name = "./gcode/Cube.gcode"
+    pause_file_name = "./txtfiles/pause.txt"
 
     with open(pause_file_name, "w") as f:
         f.write("1")
-    with open("./gcode/" + file_name, "r") as f:
+    with open(file_name, "r") as f:
         for line in f:
             if "G0" in line or "G1" in line:
                 x = -1

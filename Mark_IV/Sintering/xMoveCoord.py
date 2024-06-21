@@ -42,13 +42,14 @@ def xMoveCoord(coord=5, speed_mod=0.6, pause=False):
     CCW = 1
     motor_flag = 0
     x_coord = 0.0
-    file_name = "x_coord.txt"
-    brightness_file_name = "brightness_val.txt"
+    file_name = "./txtfiles/x_coord.txt"
+    brightness_file_name = "./txtfiles/brightness_val.txt"
     os.chdir("/home/pi/Exolith_Lab/Mark_IV/Sintering")
 
-    # Based on distance traveled each step of the motor.
+    # Based on distance traveled each step of the motor along the threaded rod.
     increment = 0.000635
 
+    # Setup x limit switch
     GPIO.setmode(GPIO.BCM)
     motor1_switch = int(os.getenv("limitSwitchX_1"))
     GPIO.setup(motor1_switch, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -57,38 +58,45 @@ def xMoveCoord(coord=5, speed_mod=0.6, pause=False):
     GPIO.setup(DIR, GPIO.OUT)
     GPIO.setup(STEP, GPIO.OUT)
 
-    #CW Away from limit switch
-
     try:
+        # Read x coordinate if file exists, otherwise make the file
         if(os.path.exists(file_name)) and os.stat(file_name).st_size != 0:
             with open(file_name, "r") as f:
                 x_coord = float(f.readline())
         else:
             with open(file_name, "w") as f:
                 f.write("0\n")
-                
+        
+        # Distance between target and current coords
         distance = abs(coord - x_coord)
-        # Set the first direction you want it to spin
+
+        # Set direction
         if coord > x_coord and distance > increment / 2:
             GPIO.output(DIR, CW)
         elif coord < x_coord and distance > increment / 2:
             GPIO.output(DIR, CCW)
             increment *= -1
         else:
+            # If the distance is too small (or 0), keep the previous coordinate and don't move
             with open(file_name, "w") as f:   
                 f.write(str(x_coord) + "\n")
             print("x: " + str(x_coord))
             return
 
+        # Calculate number of steps to move desired distance
         num_steps = int(round(distance / 0.000635, 0))
         
+        # Start updating x coordinate from the current coordinate
         f = open(file_name, "w")
         f.write(str(x_coord) + "\n")
         f.seek(0)
         brightness_file = open(brightness_file_name, "r+")
-        # # Run for 200 steps. This will change based on how you set you controller
+
+        # Move x motors step by step
         for x in range(num_steps):
+            # Check if the stand should pause when sun is not detected
             if pause and useGPS == "True":
+                # Only check if x movement should pause every 50 motor steps
                 if x % 50 == 0:
                     pixVal = brightness_file.readline()
                     if pixVal != "":
@@ -97,6 +105,7 @@ def xMoveCoord(coord=5, speed_mod=0.6, pause=False):
                         pixVal = pixMin
                     brightness_file.seek(0)
 
+                # Enter pausing loop until the brightness value passes a certain threshold
                 while(pixVal < pixMin):
                     time.sleep(0.01)
                     pixVal = brightness_file.readline()
@@ -112,23 +121,27 @@ def xMoveCoord(coord=5, speed_mod=0.6, pause=False):
             
             # Set one coil winding to high
             GPIO.output(STEP,GPIO.HIGH)
-            # Allow it to get there.
+
             #.5 == super slow
             # .00005 == breaking
             sleep(.001 / speed_mod) # Dictates how fast stepper motor will run
+
             # Set coil winding to low
             GPIO.output(STEP,GPIO.LOW)
             sleep(.001 / speed_mod) # Dictates how fast stepper motor will run
 
+            # Update coordinate
             x_coord += increment
             f.write(str(x_coord) + "\n")
             f.seek(0)
 
+            # Check limit switch actuation
             if GPIO.input(motor1_switch) == 0 and increment < 0:
                 motor_flag += 1
             else:
                 motor_flag = 0
 
+            # Stop x motors if limit switch was activated 5 times in a row or more
             if motor_flag >= 5:
                 f.close()
                 with open(file_name, "w") as f:

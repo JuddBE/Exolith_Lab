@@ -1,5 +1,9 @@
 import sys
 
+"""
+Script used by desktop app to start next print layer.
+"""
+
 def main():
     directory = "./Exolith_Lab/Mark_IV/Sintering/"
     pause_file_name = "pause.txt"

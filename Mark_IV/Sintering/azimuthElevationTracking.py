@@ -2,7 +2,7 @@ import RPi.GPIO as GPIO
 from time import sleep
 from Logging import logger
 from dotenv import load_dotenv
-from cv_tracking import find_correction
+from Mark_IV.Sintering.trackSun import find_correction
 from picamera import PiCamera
 import os 
 

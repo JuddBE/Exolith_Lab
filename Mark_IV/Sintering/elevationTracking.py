@@ -1,5 +1,4 @@
 import time
-import sys
 import math
 from Kalman import KalmanAngle
 import smbus
@@ -9,8 +8,7 @@ from Logging import logger
 from dotenv import load_dotenv
 import os
 from picamera import PiCamera
-from cv_tracking import find_correction
-import inspect
+from Mark_IV.Sintering.trackSun import find_correction
 
 # Load environment variables from .env file
 load_dotenv()
@@ -354,8 +352,8 @@ class elevation_tracker:
         delta = range_max - range_min
         return (((shiftedx % delta) + delta) % delta) + range_min
 
+    # Read the gyro and acceleromater values from MPU6050
     def read_raw_data(self, addr):
-
         while 1:
             try:
                 # Accelero and Gyro value are 16-bit
@@ -365,7 +363,7 @@ class elevation_tracker:
                 # concatenate higher and lower value
                 value = (high << 8) | low
 
-                # to get signed value from mpu6050
+                # Get signed value
                 if value > 32768:
                     value = value - 65536
 
@@ -374,18 +372,20 @@ class elevation_tracker:
             except Exception as e:
                 self.logger.logInfo("Failed to read raw MPU data: {}".format(e))
 
-    # Read the gyro and acceleromater values from MPU6050
+    # Initialize and configure MPU6050
     def MPU_Init(self):
         while 1:
             try:
-                # write to sample rate register
+                # Write to sample rate register
                 self.bus.write_byte_data(self.DeviceAddress, self.SMPLRT_DIV, 7)
                 self.bus.write_byte_data(self.DeviceAddress, self.PWR_MGMT_1, 1)
                 self.bus.write_byte_data(
                     self.DeviceAddress, self.CONFIG, int("0000110", 2)
                 )
+
                 # Write to Gyro configuration register
                 self.bus.write_byte_data(self.DeviceAddress, self.GYRO_CONFIG, 24)
+
                 # Write to interrupt enable register
                 self.bus.write_byte_data(self.DeviceAddress, self.INT_ENABLE, 1)
                 return

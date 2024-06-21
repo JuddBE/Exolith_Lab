@@ -17,7 +17,7 @@ tracker = tracker()
 # Not needed unless date is used again in the future
 # gps = GPS_Data()
 
-# Reset the elevation, azimuth does not need resetting
+# Reset lens elevation, azimuth does not need resetting
 def axisResets():
     ar = axisReset.axis_reset()
     ev_status = False
@@ -95,7 +95,7 @@ def solarElevationLogic():
 
     return status
 
-# Scan until sun is in frame for the first time.
+# Scan sky until sun is in frame for the first time.
 def azimuthLogic():
     try:
         tracker.tracking(firstTime=True)
@@ -116,7 +116,6 @@ def solarTracking():
     except KeyboardInterrupt:
         logger.logInfo("Tracking Terminated")
         
-# 
 def main():
     azimuth_status = False
     sensorStatus = False

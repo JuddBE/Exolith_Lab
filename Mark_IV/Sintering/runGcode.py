@@ -17,10 +17,11 @@ def read_gcode(file_name="Cube32mm.gcode", layer_height=0.15):
     set_offset = True
     z_speed_mod = 0.3
     pause = 1
-    pause_file_name = "pause.txt"
-    x_file_name = "x_coord.txt"
-    y_file_name = "y_coord.txt"
-    z_file_name = "z_coord.txt"
+    pause_file_name = "./txtfiles/pause.txt"
+    x_file_name = "./txtfiles/x_coord.txt"
+    y_file_name = "./txtfiles/y_coord.txt"
+    z_file_name = "./txtfiles/z_coord.txt"
+    file_name = "./gcode/" + file_name
     os.chdir("/home/pi/Exolith_Lab/Mark_IV/Sintering")
 
     # Get current x, y, and z coords. Set start coords for the print to be the current coords.
@@ -50,7 +51,7 @@ def read_gcode(file_name="Cube32mm.gcode", layer_height=0.15):
         f.write("1")
 
     # Read gcode file and interpret instructions
-    with open("./gcode/" + file_name, "r") as f:
+    with open(file_name, "r") as f:
         for line in f:
             light_pause = True
             if "G0" in line:

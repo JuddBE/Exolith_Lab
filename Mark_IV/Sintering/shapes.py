@@ -14,9 +14,9 @@ from axisReset import axis_reset
 ar = axis_reset()
 
 os.chdir("/home/pi/Exolith_Lab/Mark_IV/Sintering")
-x_file_name = "x_coord.txt"
-y_file_name = "y_coord.txt"
-pause_file_name = "pause.txt"
+x_file_name = "./txtfiles/x_coord.txt"
+y_file_name = "./txtfiles/y_coord.txt"
+pause_file_name = "./txtfiles/pause.txt"
 
 # Defines the diameter of the focal point in cm.
 

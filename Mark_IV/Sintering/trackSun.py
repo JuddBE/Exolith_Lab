@@ -50,7 +50,7 @@ def find_correction(camera):
     (_, _, _, maxLoc) = cv2.minMaxLoc(gray)
     
     # Save brightness val in file so other files can react to low or high brightness.
-    brightness_file_name = "brightness_val.txt"
+    brightness_file_name = "./txtfiles/brightness_val.txt"
     with open(brightness_file_name, "w") as f:
         f.write(str(maxVal))
 

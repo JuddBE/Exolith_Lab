@@ -14,6 +14,10 @@ from Limit_Switches import limitSwitches
 from dotenv import load_dotenv
 import os
 
+"""
+Includes functions to reset all axes (besides azimuth which doesn't have a starting position).
+"""
+
 # Load environment variables from .env file
 load_dotenv()
 

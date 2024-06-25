@@ -42,6 +42,7 @@ def zMove(distance=0.35, down=True, speed_mod=0.3):
     motor_flag_top = 0
     z_coord = 0.0
     z_file_name = "./txtfiles/z_coord.txt"
+    os.chdir("/home/pi/Exolith_Lab/Mark_IV/Sintering")
 
     # Based on distance traveled each step of the motor along the threaded rod.
     increment = 0.001

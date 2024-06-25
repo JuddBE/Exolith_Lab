@@ -11,6 +11,10 @@ from xyCircleFill import xyCircleFill
 from math import sqrt
 from axisReset import axis_reset
 
+"""
+File that draws shapes on the sintering box with the focal point. Was mostly used before GCODE.
+"""
+
 ar = axis_reset()
 
 os.chdir("/home/pi/Exolith_Lab/Mark_IV/Sintering")

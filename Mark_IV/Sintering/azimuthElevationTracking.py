@@ -2,9 +2,13 @@ import RPi.GPIO as GPIO
 from time import sleep
 from Logging import logger
 from dotenv import load_dotenv
-from Mark_IV.Sintering.trackSun import find_correction
+from trackSun import find_correction
 from picamera import PiCamera
 import os 
+
+"""
+Tracks the sun during solar alignment. Does not include initialization of azimuth and elevation.
+"""
 
 # Load environment variables from .env file
 load_dotenv()

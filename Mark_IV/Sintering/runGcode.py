@@ -6,7 +6,12 @@ from axisReset import axis_reset
 import os
 import sys
 
+"""
+Sinters an object according to a GCODE file.
+"""
+
 def read_gcode(file_name="Cube32mm.gcode", layer_height=0.15):
+    # Initialize start coord, offsets, speed values, and file names
     current_layer = 0
     start_coord = [5, 5, 1.4]
     x_offset = 0.0
@@ -31,7 +36,7 @@ def read_gcode(file_name="Cube32mm.gcode", layer_height=0.15):
     else:
         with open(x_file_name, "w") as f:
             f.write("0\n")
-    
+
     if(os.path.exists(y_file_name)) and os.stat(y_file_name).st_size != 0:
         with open(y_file_name, "r") as f:
             start_coord[1] = float(f.readline())
@@ -54,16 +59,23 @@ def read_gcode(file_name="Cube32mm.gcode", layer_height=0.15):
     with open(file_name, "r") as f:
         for line in f:
             light_pause = True
+            # Prepare for G0 function (move without sintering)
             if "G0" in line:
                 xy_speed_mod = xy_fast
                 light_pause = False
+
+            # Prepare for G1 function (move while sintering)
             if "G1" in line:
                 xy_speed_mod = xy_slow
+
+            # Perform movement function
             if "G0" in line or "G1" in line:
                 x = -1
                 y = -1
                 z = -1
                 line_segs = line.split(' ')
+
+                # Set x, y, z destinations for a line
                 for seg in line_segs:
                     if seg[0] == "X":
                         x = float(seg[1:]) / 10
@@ -74,6 +86,9 @@ def read_gcode(file_name="Cube32mm.gcode", layer_height=0.15):
                     elif seg[0] == "Z":
                         z = current_layer * layer_height + start_coord[2]
 
+                # The first time all axes are moved, set the offset for each axis based on this.
+                # That is because the first coordinate is the starting coordinate for the gcode,
+                # and we want to consider that coordinate as (0, 0, 0) for the print.
                 if x != -1 and y != -1 and z != -1 and set_offset:
                     set_offset = False
                     if start_coord[0] > 0.5:
@@ -83,12 +98,16 @@ def read_gcode(file_name="Cube32mm.gcode", layer_height=0.15):
                     if start_coord[2] > 0.5:
                         z_offset = start_coord[2] - z
                 
+                # Move x and y
                 if x != -1 and y != -1:
                     xyMoveCoord(x + x_offset, y + y_offset, xy_speed_mod, pause=light_pause)
+                # Move x
                 elif x != -1 and y == -1:
                     xMoveCoord(x + x_offset, xy_speed_mod, pause=light_pause)
+                # Move y
                 elif x == -1 and y != -1:
                     yMoveCoord(y + y_offset, xy_speed_mod, pause=light_pause)
+                # Move z
                 if z != -1:
                     current_layer += 1
                     zMoveCoord(z + z_offset, z_speed_mod)

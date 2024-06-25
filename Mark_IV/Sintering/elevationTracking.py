@@ -8,7 +8,11 @@ from Logging import logger
 from dotenv import load_dotenv
 import os
 from picamera import PiCamera
-from Mark_IV.Sintering.trackSun import find_correction
+from trackSun import find_correction
+
+"""
+Used for elevation initialization at the start of solar alignment. Will be interupted if the sun is detected.
+"""
 
 # Load environment variables from .env file
 load_dotenv()

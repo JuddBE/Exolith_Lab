@@ -2,6 +2,10 @@ import cv2
 import numpy as np
 from time import sleep
 
+"""
+Detects the sun using a frame from the camera. returns if and at what scale azimuth and elevation should move.
+"""
+
 def find_correction(camera):
     # Set threshold determining how many pixels the detected point
     # can be off from the desired location before correcting.

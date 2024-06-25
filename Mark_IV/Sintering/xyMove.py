@@ -5,7 +5,7 @@ from yMove import yMove
 import sys
 
 """
-Moves both X and Y axis a specified distance simultaneously and ending at the same time.
+Moves both X and Y axis a specified distance simultaneously.
 Uses multithreading.
 """
 

@@ -2,9 +2,13 @@ import RPi.GPIO as GPIO
 from time import sleep
 from Logging import logger
 from dotenv import load_dotenv
-from cv_tracking import find_correction
+from trackSun import find_correction
 from picamera import PiCamera
 import os 
+
+"""
+Tracks the sun during solar alignment. Does not include initialization of azimuth and elevation.
+"""
 
 # Load environment variables from .env file
 load_dotenv()
@@ -183,132 +187,7 @@ class tracker:
             GPIO.cleanup()
             camera.stop_preview()
             camera.close()
-
-    # def tracking(self):
-    #     os.chdir("/home/pi/Exolith_Lab/Mark_IV/Sintering")
-    #     while True:
-    #         pic_info = find_correction()
-    #         if pic_info[0] == "stay" and pic_info[2] >= self.maxVal:
-    #             self.logger.logInfo("Azimuth adjustment reached...")
-    #             sleep(1)
-
-    #         else:
-    #             self.logger.logInfo("Azimuth adjustment required...")
-    #             GPIO.setwarnings(False)
-    #             GPIO.cleanup()
-
-    #             DIR_1 = int(os.getenv("AZIMUTH_Direction"))  # DIR+
-    #             STEP_1 = int(os.getenv("AZIMUTH_Pulse"))  # PULL+
-
-    #             direction = 0  # 0/1 used to signify clockwise or counterclockwise.
-                
-    #             steps = 5  # small increment of search
-
-    #             # Setup pin layout on PI
-    #             GPIO.setmode(GPIO.BCM)
-
-    #             # Establish Pins in software
-    #             GPIO.setup(DIR_1, GPIO.OUT)
-    #             GPIO.setup(STEP_1, GPIO.OUT)
-
-    #             try:
-
-    #                 for x in range(steps):
-    #                     self.logger.logInfo("Adjusting azimuth....")
-
-    #                     # Get movements from image taken by camera.
-    #                     pic_info = find_correction()
-    #                     az_dir = pic_info[0]
-
-    #                     # If the sun is in the middle of the image, azimuth is correct.
-    #                     # 0/1 used to signify clockwise or counterclockwise.
-    #                     if az_dir == "right":
-    #                         direction = 0
-    #                     elif az_dir == "left":
-    #                         direction = 1
-    #                     else:
-    #                         self.logger.logInfo("Azimuth Adjusted")
-    #                         sleep(1)
-    #                         break
-                        
-    #                     # Set the first direction you want it to spin
-    #                     GPIO.output(DIR_1, direction)
-
-    #                     # Turn azimuth.
-    #                     for _ in range(40):
-    #                         GPIO.output(STEP_1, GPIO.HIGH)
-    #                         # .5 == super slow
-    #                         # .00005 == breaking
-    #                         sleep(0.001)
-    #                         GPIO.output(STEP_1, GPIO.LOW)
-    #                         sleep(0.001)
-
-    #             # Once finished clean everything up
-    #             except Exception as e:
-    #                 self.logger.logInfo("Tracking Exception: {}".format(e))
-    #                 GPIO.cleanup()
-
-    #         if pic_info[1] == "stay" and pic_info[2] >= self.maxVal:
-    #             self.logger.logInfo("Elevation adjustment reached...")
-    #             sleep(1)
-
-    #         else:
-    #             self.logger.logInfo("Elevation adjustment required...")
-    #             GPIO.setwarnings(False)
-    #             GPIO.cleanup()
-
-    #             DIR_1 = int(os.getenv("ELAVATION_Direction"))
-    #             STEP_1 = int(os.getenv("ELAVATION_Pulse"))
-
-    #             direction = 0  # 0/1 used to signify clockwise or counterclockwise.
-                
-    #             steps = 5  # small increment of search
-
-    #             # Setup pin layout on PI
-    #             GPIO.setmode(GPIO.BCM)
-
-    #             # Establish Pins in software
-    #             GPIO.setup(DIR_1, GPIO.OUT)
-    #             GPIO.setup(STEP_1, GPIO.OUT)
-
-    #             try:
-
-    #                 for x in range(steps):
-    #                     self.logger.logInfo("Adjusting elevation....")
-
-    #                     # Get movements from image taken by camera.
-    #                     pic_info = find_correction()
-    #                     elev_dir = pic_info[0]
-
-    #                     # If the sun is in the middle of the image, azimuth is correct.
-    #                     # 0/1 used to signify clockwise or counterclockwise.
-    #                     if elev_dir == "down":
-    #                         direction = 0
-    #                     elif elev_dir == "up":
-    #                         direction = 1
-    #                     else:
-    #                         self.logger.logInfo("Elevation Adjusted")
-    #                         sleep(1)
-    #                         break
-                        
-    #                     # Set the first direction you want it to spin
-    #                     GPIO.output(DIR_1, direction)
-
-    #                     # Move elevation.
-    #                     for _ in range(4):
-    #                         GPIO.output(STEP_1, GPIO.HIGH)
-    #                         # .5 == super slow
-    #                         # .00005 == breaking
-    #                         sleep(0.05)
-    #                         GPIO.output(STEP_1, GPIO.LOW)
-    #                         sleep(0.05)
-
-    #             # Once finished clean everything up
-    #             except Exception as e:
-    #                 self.logger.logInfo("Tracking Exception: {}".format(e))
-    #                 GPIO.cleanup()
             
-
 def main():
     at = tracker()
     # at.stepMovement(1, 100)

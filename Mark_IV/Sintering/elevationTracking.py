@@ -1,5 +1,4 @@
 import time
-import sys
 import math
 from Kalman import KalmanAngle
 import smbus
@@ -9,8 +8,11 @@ from Logging import logger
 from dotenv import load_dotenv
 import os
 from picamera import PiCamera
-from cv_tracking import find_correction
-import inspect
+from trackSun import find_correction
+
+"""
+Used for elevation initialization at the start of solar alignment. Will be interupted if the sun is detected.
+"""
 
 # Load environment variables from .env file
 load_dotenv()
@@ -39,7 +41,6 @@ class elevation_tracker:
         self.logger = logger()
 
     def sunpos(self, when, location, refraction):
-
         # Extract the passed data
         year, month, day, hour, minute, second, timezone = when
         latitude, longitude = location
@@ -115,6 +116,7 @@ class elevation_tracker:
         # Return azimuth and elevation in degrees
         return (round(azimuth, 2), round(elevation, 2))
 
+    # Set elevation angle and stop if sun enters the camera's view.
     def solarElevationPositioning(self, elevation):
         GPIO.setwarnings(False)
 
@@ -131,6 +133,7 @@ class elevation_tracker:
         # Should be set by user, either via flag or direct input
         accuracy = 1.0
         degOffset = 0
+        delay = 0.05
 
         # Setup pin layout on RPI
         GPIO.setmode(GPIO.BCM)
@@ -148,8 +151,10 @@ class elevation_tracker:
         self.logger.logInfo("Current Solar Elevation: {}".format(elevation))
         time.sleep(1)
 
+        # Degrees from current to desired angle
         degreeDifferenceX = float(currentTiltAngleX) - float(elevation)
 
+        # Initialize camera, used to stop elevation setting if the sun is in frame
         camera = PiCamera()
         camera.start_preview()
         sleep(3.0)
@@ -157,31 +162,41 @@ class elevation_tracker:
         try:
             while abs(degreeDifferenceX) > accuracy:
                 
-                # check if sun is in frame
+                # Check if sun is in frame
                 pic_info = find_correction(camera)
                 
-                # check max pixel brightness
+                # Check max pixel brightness
                 if pic_info[2] >= 200:
                     self.logger.logInfo("Sun in frame...")
                     break
 
                 self.logger.logInfo("Adjusting Elevation Angle...")
+
+                # Change speed of correction based on how many degrees the current angle is off by
+                # Faster if the current angle is far away from the desired angle
                 delay = 0.05
                 if abs(degreeDifferenceX) > 1.5:
                     degreeDev = abs(degreeDifferenceX) * 8
                 else:
                     degreeDev = abs(degreeDifferenceX) * 4
-                    delay = 0.2
 
+                    # Longer delay for small adjustments allows lens to come to complete stop for accurate angle readings
+                    delay = 0.2 
+
+                # Determines number of steps for stepper motor, round up to the next step
                 degreeDev = math.ceil(degreeDev)
+
+                # Set max number of steps to move at once
                 if degreeDev > 160:
                     degreeDev = 160
 
+                # Set motor direction
                 if degreeDifferenceX > 0:
                     GPIO.output(DIR, CW)
                 else:
                     GPIO.output(DIR, CCW)
 
+                # Move steps
                 for x in range(int(degreeDev)):
                     GPIO.output(STEP, GPIO.HIGH)
                     sleep(delay)  # Dictates how fast stepper motor will run
@@ -220,10 +235,12 @@ class elevation_tracker:
 
         time.sleep(1)
 
+        # Offsets found through calibration
         accX_offset = -300
         accY_offset = -200
         accZ_offset = -1200
-        # Read Accelerometer raw value
+
+        # Read Accelerometer raw value and apply offsets
         accX = self.read_raw_data(self.ACCEL_XOUT_H) + accX_offset
         accY = self.read_raw_data(self.ACCEL_YOUT_H) + accY_offset
         accZ = self.read_raw_data(self.ACCEL_ZOUT_H) + accZ_offset
@@ -255,7 +272,7 @@ class elevation_tracker:
                 flag = 0
                 continue
             try:
-                # Read Accelerometer raw value
+                # Read Accelerometer raw value and apply offset
                 accX = self.read_raw_data(self.ACCEL_XOUT_H) + accX_offset
                 accY = self.read_raw_data(self.ACCEL_YOUT_H) + accY_offset
                 accZ = self.read_raw_data(self.ACCEL_ZOUT_H) + accZ_offset
@@ -339,8 +356,8 @@ class elevation_tracker:
         delta = range_max - range_min
         return (((shiftedx % delta) + delta) % delta) + range_min
 
+    # Read the gyro and acceleromater values from MPU6050
     def read_raw_data(self, addr):
-
         while 1:
             try:
                 # Accelero and Gyro value are 16-bit
@@ -350,7 +367,7 @@ class elevation_tracker:
                 # concatenate higher and lower value
                 value = (high << 8) | low
 
-                # to get signed value from mpu6050
+                # Get signed value
                 if value > 32768:
                     value = value - 65536
 
@@ -359,18 +376,20 @@ class elevation_tracker:
             except Exception as e:
                 self.logger.logInfo("Failed to read raw MPU data: {}".format(e))
 
-    # Read the gyro and acceleromater values from MPU6050
+    # Initialize and configure MPU6050
     def MPU_Init(self):
         while 1:
             try:
-                # write to sample rate register
+                # Write to sample rate register
                 self.bus.write_byte_data(self.DeviceAddress, self.SMPLRT_DIV, 7)
                 self.bus.write_byte_data(self.DeviceAddress, self.PWR_MGMT_1, 1)
                 self.bus.write_byte_data(
                     self.DeviceAddress, self.CONFIG, int("0000110", 2)
                 )
+
                 # Write to Gyro configuration register
                 self.bus.write_byte_data(self.DeviceAddress, self.GYRO_CONFIG, 24)
+
                 # Write to interrupt enable register
                 self.bus.write_byte_data(self.DeviceAddress, self.INT_ENABLE, 1)
                 return

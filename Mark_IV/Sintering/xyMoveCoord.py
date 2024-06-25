@@ -6,13 +6,13 @@ import os
 import sys
 
 """
-Moves both X and Y axis a specified distance simultaneously and ending at the same time.
+Moves both X and Y axis to a specified coordinate simultaneously.
 Uses multithreading.
 """
 
 def xyMoveCoord(x_coord=5, y_coord=5, speed_mod=0.5, pause=False):
-    x_file_name = "x_coord.txt"
-    y_file_name = "y_coord.txt"
+    x_file_name = "./txtfiles/x_coord.txt"
+    y_file_name = "./txtfiles/y_coord.txt"
     os.chdir("/home/pi/Exolith_Lab/Mark_IV/Sintering")
     x_speed_mod = speed_mod
     y_speed_mod = speed_mod

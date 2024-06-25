@@ -42,13 +42,14 @@ def yMove(distance=10, clockwise=True, speed_mod=0.6, pause=True):
     CCW = 1
     motor_flag = 0
     y_coord = 0.0
-    file_name = "y_coord.txt"
-    brightness_file_name = "brightness_val.txt"
+    file_name = "./txtfiles/y_coord.txt"
+    brightness_file_name = "./txtfiles/brightness_val.txt"
     os.chdir("/home/pi/Exolith_Lab/Mark_IV/Sintering")
 
-    # Based on distance traveled each step of the motor in cm.
+    # Based on distance traveled each step of the motor along the threaded rod.
     increment = 0.000635
 
+    # Setup y limit switches
     GPIO.setmode(GPIO.BCM)
     motor1_switch = int(os.getenv("limitSwitchY_1"))
     motor2_switch = int(os.getenv("limitSwitchY_2"))
@@ -66,23 +67,29 @@ def yMove(distance=10, clockwise=True, speed_mod=0.6, pause=True):
         GPIO.output(DIR, CCW)
         increment *= -1
 
-    #CW Away from limit switch
     try:
+        # Read y coordinate if file exists, otherwise make the file
         if(os.path.exists(file_name)) and os.stat(file_name).st_size != 0:
             with open(file_name, "r") as f:
                 y_coord = float(f.readline())
         else:
             with open(file_name, "w") as f:
                 f.write("0\n")
+
+        # Calculate number of steps to move desired distance
         num_steps = int(round(distance / 0.000635, 0))
         
+        # Start updating y coordinate from the current coordinate
         f = open(file_name, "w")
         f.write(str(y_coord) + "\n")
         f.seek(0)
         brightness_file = open(brightness_file_name, "r+")
-        # # Run for 200 steps. This will change based on how you set you controller
+
+        # Move y motors step by step
         for x in range(num_steps):
+            # Check if the stand should pause when sun is not detected
             if pause and useGPS == "True":
+                # Only check if x movement should pause every 50 motor steps
                 if x % 50 == 0:
                     pixVal = brightness_file.readline()
                     if pixVal != "":
@@ -91,6 +98,7 @@ def yMove(distance=10, clockwise=True, speed_mod=0.6, pause=True):
                         pixVal = pixMin
                     brightness_file.seek(0)
 
+                # Enter pausing loop until the brightness value passes a certain threshold
                 while(pixVal < pixMin):
                     time.sleep(0.01)
                     pixVal = brightness_file.readline()
@@ -106,7 +114,7 @@ def yMove(distance=10, clockwise=True, speed_mod=0.6, pause=True):
 
             # Set one coil winding to high
             GPIO.output(STEP,GPIO.HIGH)
-            # Allow it to get there.
+
             #.5 == super slow
             # .00005 == breaking
             sleep(.001 / speed_mod) # Dictates how fast stepper motor will run
@@ -114,15 +122,18 @@ def yMove(distance=10, clockwise=True, speed_mod=0.6, pause=True):
             GPIO.output(STEP,GPIO.LOW)
             sleep(.001 / speed_mod) # Dictates how fast stepper motor will run
 
+            # Update coordinate
             y_coord += increment
             f.write(str(y_coord) + "\n")
             f.seek(0)
 
+            # Check limit switch actuation
             if (GPIO.input(motor2_switch) == 0 or GPIO.input(motor1_switch) == 0) and clockwise == False:
                 motor_flag += 1
             else:
                 motor_flag = 0
 
+            # Stop y motors if limit switch was activated 5 times in a row or more
             if motor_flag >= 5:
                 y_coord = 0.0
                 f.close()

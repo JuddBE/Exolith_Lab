@@ -2,6 +2,10 @@ import os
 import sys
 from dotenv import load_dotenv, find_dotenv, set_key
 
+"""
+Script used by desktop app to update whether the stand should use gps or not.
+"""
+
 # Load environment variables from .env file
 env_file = find_dotenv()
 load_dotenv(env_file)

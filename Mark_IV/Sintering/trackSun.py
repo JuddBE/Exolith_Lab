@@ -69,11 +69,11 @@ def find_correction(camera):
     azim_offset = 70
 
     # Visualization
-    cv2.circle(img, maxLoc, 1, 0, 2)
-    cv2.circle(img, (mid_width - thresh_pixel + azim_offset, resolution[1] // 2 - thresh_pixel + elev_offset), 1, 0, 2)
-    cv2.circle(img, (mid_width + thresh_pixel + azim_offset, resolution[1] // 2 + thresh_pixel + elev_offset), 1, 0, 2)
-    cv2.circle(img, (resolution[0] // 2 + thresh_pixel + azim_offset, mid_height + elev_offset - thresh_pixel), 1, 0, 2)
-    cv2.circle(img, (resolution[0] // 2 - thresh_pixel + azim_offset, mid_height + elev_offset + thresh_pixel), 1, 0, 2)
+    # cv2.circle(img, maxLoc, 1, 0, 2)
+    # cv2.circle(img, (mid_width - thresh_pixel + azim_offset, resolution[1] // 2 - thresh_pixel + elev_offset), 1, 0, 2)
+    # cv2.circle(img, (mid_width + thresh_pixel + azim_offset, resolution[1] // 2 + thresh_pixel + elev_offset), 1, 0, 2)
+    # cv2.circle(img, (resolution[0] // 2 + thresh_pixel + azim_offset, mid_height + elev_offset - thresh_pixel), 1, 0, 2)
+    # cv2.circle(img, (resolution[0] // 2 - thresh_pixel + azim_offset, mid_height + elev_offset + thresh_pixel), 1, 0, 2)
     
     # Determine desired correction direction and magnitude and return.
     pic_info = ["stay", "stay", maxVal, abs(mid_width + azim_offset - maxLoc[0]), abs(mid_height + elev_offset - maxLoc[1])]

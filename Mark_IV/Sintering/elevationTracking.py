@@ -175,20 +175,22 @@ class elevation_tracker:
                 # Change speed of correction based on how many degrees the current angle is off by
                 # Faster if the current angle is far away from the desired angle
                 delay = 0.05
-                if abs(degreeDifferenceX) > 1.5:
-                    degreeDev = abs(degreeDifferenceX) * 8
+                if abs(degreeDifferenceX) > 6:
+                    degreeDev = abs(degreeDifferenceX) * 32
+                elif abs(degreeDifferenceX) > 1.5:
+                    degreeDev = abs(degreeDifferenceX) * 28
                 else:
-                    degreeDev = abs(degreeDifferenceX) * 4
+                    degreeDev = abs(degreeDifferenceX) * 12
 
                     # Longer delay for small adjustments allows lens to come to complete stop for accurate angle readings
-                    delay = 0.2 
+                    delay = 0.2
 
                 # Determines number of steps for stepper motor, round up to the next step
                 degreeDev = math.ceil(degreeDev)
 
                 # Set max number of steps to move at once
-                if degreeDev > 160:
-                    degreeDev = 160
+                if degreeDev > 400:
+                    degreeDev = 400
 
                 # Set motor direction
                 if degreeDifferenceX > 0:

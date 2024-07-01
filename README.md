@@ -13,7 +13,7 @@ Python 3.6 or higher
 
 Clone this repository to your local machine using 
 
-***_git clone_ https://github.com/Bpatt9690/Exolith_Lab.***
+***_git clone_ https://github.com/JuddBE/Exolith_Lab***
 
 Install the required packages using _pip install -r requirements.txt_.
 

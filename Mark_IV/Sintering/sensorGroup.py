@@ -1,4 +1,5 @@
 import smbus
+import time
 
 class sensor_group:
     def __init__(self):
@@ -37,7 +38,11 @@ class sensor_group:
         if value > 32768:
             value = value - 65536
 
+        time.sleep(0.3)
+
         if value != 0:
             return True
         else:
             return False
+        
+        

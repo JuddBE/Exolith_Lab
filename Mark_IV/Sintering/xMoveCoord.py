@@ -1,7 +1,9 @@
 import RPi.GPIO as GPIO
 from time import sleep
 from Limit_Switches import limitSwitches
+from elevationTracking import elevation_tracker
 import time
+import math
 from dotenv import load_dotenv
 import os
 import sys
@@ -14,6 +16,7 @@ Moves both motor 1 and motor 2 of the X axis. Currently CW || 0 moves the x axis
 DOES NOT HAVE LIMIT SWITCH FUNCTIONALITY INCLUDED. POTENTIALLY DESTRUCTIVE 
 """
 
+et = elevation_tracker()
 ls = limitSwitches()
 
 
@@ -66,6 +69,20 @@ def xMoveCoord(coord=5, speed_mod=0.6, pause=False):
         else:
             with open(file_name, "w") as f:
                 f.write("0\n")
+
+        # # currentTiltAngleX, currentTiltAngleY = et.tiltAngle() # Get current elev angle.
+        # currentTiltAngleX = et.kalAngleX # Get current elev angle.
+        # print(currentTiltAngleX)
+
+        # print("Before: " + str(coord))
+        # # Calculate x offset due to angle of sun by focusing the lens 
+        # # at the F1 (more positive x coordinate side) focus of the ellipse.
+        # focal_diameter = 0.6
+        # ellipse_b = focal_diameter / 2.0
+        # ellipse_a = ellipse_b * (1.0 / (1 - math.cos(float(currentTiltAngleX) * math.pi / 180)))
+        # # coord = coord + math.sqrt(abs(ellipse_a * ellipse_a - ellipse_b * ellipse_b))
+        # coord += abs(ellipse_a / 2)
+        # print("After: " + str(coord))
         
         # Distance between target and current coords
         distance = abs(coord - x_coord)
@@ -115,7 +132,7 @@ def xMoveCoord(coord=5, speed_mod=0.6, pause=False):
                         pixVal = 0
                     brightness_file.seek(0)
 
-            if x_coord + increment > X_MAX and increment > 0:
+            if x_coord + increment > X_MAX:
                 print("X Coordinate out of bounds")
                 return
             

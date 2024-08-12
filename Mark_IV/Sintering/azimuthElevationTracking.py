@@ -4,6 +4,7 @@ from Logging import logger
 from dotenv import load_dotenv
 from trackSun import find_correction
 from picamera import PiCamera
+import math
 import os 
 
 """

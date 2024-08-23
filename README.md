@@ -7,8 +7,6 @@ This repository contains the code responsible for controlling an automated regol
 
 Python 3.6 or higher
 
-
-
 ***Getting Started***
 
 Clone this repository to your local machine using 
@@ -19,16 +17,20 @@ Install the required packages using _pip install -r requirements.txt_.
 
 Interface with the regolith sintering stand to your computer over wifi/ethernet using ssh.
 
-Run the code using _python3 solarAlignment.py_ to start the automated tracking process.
+**How to run**
+Run _python3 solarAlignment.py_ to start the automated tracking process to align the lens with the sun.
 
-"Not implement yet but should be"
+Run _python3 runGcode.py [name of gcode file]_ to start printing a specific GCODE file.
+
+Use the app for ease of use, which is pinned on the Exolith sintering slack channel and does not require interfacing with a terminal.
 
 (The code provides a command-line interface that allows you to control the regolith sintering stand.) The following commands are available:
 
-start: start the sintering process
-stop: stop the sintering process
-status: display the current status of the sintering process
-exit: exit the program
+python3 xMoveCoord.py [coord] [optional: speed 0-1]
+python3 yMoveCoord.py [coord] [optional: speed 0-1]
+python3 zMoveCoord.py [coord] [optional: speed 0-1]
+python3 runGcode.py [name of gcode file]
+python3 shapes.py ["box3d", "box2d", "circle", "cylinder"]
 
 ***Contributions***
 
@@ -37,8 +39,6 @@ Contributions are welcome. If you find a bug or have an idea for a new feature, 
 ***License***
 
 This project is licensed under Exolith Lab License.
-
-
 
 Semantic Versioning
 ===================

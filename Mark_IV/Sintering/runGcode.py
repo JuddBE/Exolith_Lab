@@ -26,7 +26,7 @@ def read_gcode(file_name="Cube32mm.gcode", layer_height=0.15):
     y_offset = 0.0
     z_offset = 0.0
     xy_fast = 1.0
-    xy_slow = 0.8
+    xy_slow = 0.1
     set_offset = True
     z_speed_mod = 0.3
     pause = 1

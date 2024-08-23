@@ -42,8 +42,11 @@ def yMove(distance=10, clockwise=True, speed_mod=0.6, pause=True):
     CCW = 1
     motor_flag = 0
     y_coord = 0.0
+    pixVal = 255
+    manual_pause = False
     file_name = "./txtfiles/y_coord.txt"
     brightness_file_name = "./txtfiles/brightness_val.txt"
+    manual_pause_file_name = "./txtfiles/manual_pause.txt"
     os.chdir("/home/pi/Exolith_Lab/Mark_IV/Sintering")
 
     # Based on distance traveled each step of the motor along the threaded rod.
@@ -76,6 +79,16 @@ def yMove(distance=10, clockwise=True, speed_mod=0.6, pause=True):
             with open(file_name, "w") as f:
                 f.write("0\n")
 
+        # Check if the print has been manually paused by the app
+        if(os.path.exists(manual_pause_file_name)) and os.stat(manual_pause_file_name).st_size != 0:
+            with open(manual_pause_file_name, "r") as f:
+                manual_pause = float(f.readline())
+                if manual_pause == "1":
+                    manual_pause = True
+        else:
+            with open(manual_pause_file_name, "w") as f:
+                f.write("0\n")
+
         # Calculate number of steps to move desired distance
         num_steps = int(round(distance / 0.000635, 0))
         
@@ -84,13 +97,31 @@ def yMove(distance=10, clockwise=True, speed_mod=0.6, pause=True):
         f.write(str(y_coord) + "\n")
         f.seek(0)
         brightness_file = open(brightness_file_name, "r+")
+        manual_pause_file = open(manual_pause_file_name, "r+")
 
         # Move y motors step by step
         for x in range(num_steps):
+            # Update pause variable
+            manual_pause = manual_pause_file.readline()
+            if manual_pause == "1":
+                manual_pause = True
+            else:
+                # If manual pause changes from True to False, check for new brightness val.
+                if manual_pause:
+                    pixVal = brightness_file.readline()
+                    if pixVal != "":
+                        pixVal = float(pixVal)
+                    else:
+                        pixVal = pixMin
+                    brightness_file.seek(0)
+                manual_pause = False
+            manual_pause_file.seek(0)
+
             # Check if the stand should pause when sun is not detected
-            if pause and useGPS == "True":
+            if (pause and useGPS == "True") or manual_pause:
                 # Only check if x movement should pause every 50 motor steps
                 if x % 50 == 0:
+                    brightness_file.seek(0)
                     pixVal = brightness_file.readline()
                     if pixVal != "":
                         pixVal = float(pixVal)
@@ -99,13 +130,20 @@ def yMove(distance=10, clockwise=True, speed_mod=0.6, pause=True):
                     brightness_file.seek(0)
 
                 # Enter pausing loop until the brightness value passes a certain threshold
-                while(pixVal < pixMin):
+                # or until the manual pause is disabled
+                while (pixVal < pixMin and useGPS == "True" and pause) or manual_pause:
                     time.sleep(0.01)
                     pixVal = brightness_file.readline()
+                    manual_pause = manual_pause_file.readline()
                     if pixVal != "":
                         pixVal = float(pixVal)
                     else:
                         pixVal = 0
+                    if manual_pause == "1":
+                        manual_pause = True
+                    else:
+                        manual_pause = False
+                    manual_pause_file.seek(0)
                     brightness_file.seek(0)
                     
             if y_coord + increment > Y_MAX and clockwise:

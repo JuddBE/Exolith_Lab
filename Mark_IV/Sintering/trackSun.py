@@ -17,6 +17,8 @@ def find_correction(camera):
     camera.capture('./imgs/sun.jpg')
     img = cv2.imread('./imgs/sun.jpg', cv2.IMREAD_COLOR)
 
+    img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
+
     # Convert to hsv for color masking.
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     hsv = cv2.GaussianBlur(hsv, (3, 3), 0)
@@ -65,8 +67,8 @@ def find_correction(camera):
 
     # Initialize tested pixel offsets for sun position in frame.
     # This accounts for the fact that the camera is not perfectly alined with the lens.
-    elev_offset = -31
-    azim_offset = 70
+    elev_offset = -12
+    azim_offset = 85
 
     # Visualization
     # cv2.circle(img, maxLoc, 1, 0, 2)

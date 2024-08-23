@@ -3,6 +3,9 @@ from xMoveCoord import xMoveCoord
 from xyMoveCoord import xyMoveCoord
 from zMoveCoord import zMoveCoord
 from axisReset import axis_reset
+from elevationTracking import elevation_tracker
+import time
+from Logging import logger
 import os
 import sys
 
@@ -10,7 +13,12 @@ import sys
 Sinters an object according to a GCODE file.
 """
 
+et = elevation_tracker()
+log = logger()
+
 def read_gcode(file_name="Cube32mm.gcode", layer_height=0.15):
+    log.logInfo("Print name: " + file_name)
+
     # Initialize start coord, offsets, speed values, and file names
     current_layer = 0
     start_coord = [5, 5, 1.4]
@@ -112,9 +120,13 @@ def read_gcode(file_name="Cube32mm.gcode", layer_height=0.15):
                     current_layer += 1
                     zMoveCoord(z + z_offset, z_speed_mod)
 
-                    # If not first layer (gcode files have 2 z movements before needing to start the 2nd layer)
+                    currentTiltAngleX, currentTiltAngleY = et.tiltAngle()
+                    currentTiltAngleX = 90 - (float(currentTiltAngleX) * (-1)) + et.degOffset
+                    log.logInfo("Layer " + str(current_layer - 1) + ": " + str(round(currentTiltAngleX, 4)) + " degrees")
+                    
+                    # If not first layer (gcode files have 2 z movements before moving to the 2nd layer)
                     # Then pause and wait until user starts the new layer.
-                    if current_layer > 2:
+                    if current_layer > 1:
                         while(pause != "0"):
                             with open(pause_file_name, "r") as f:
                                 pause = f.readline()

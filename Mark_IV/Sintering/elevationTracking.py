@@ -23,6 +23,7 @@ class elevation_tracker:
         self.DeviceAddress = 0x68
         self.RestrictPitch = True
         self.radToDeg = 57.2957786
+        self.degOffset = 0
         self.kalAngleX = 0
         self.kalAngleY = 0
 
@@ -132,7 +133,6 @@ class elevation_tracker:
 
         # Should be set by user, either via flag or direct input
         accuracy = 1.0
-        degOffset = 0
         delay = 0.05
 
         # Setup pin layout on RPI
@@ -143,7 +143,7 @@ class elevation_tracker:
         currentTiltAngleX, currentTiltAngleY = self.tiltAngle()
 
         # Gathering current tilt angle from sensor
-        currentTiltAngleX = 90 - (float(currentTiltAngleX) * (-1)) + degOffset
+        currentTiltAngleX = 90 - (float(currentTiltAngleX) * (-1)) + self.degOffset
 
         self.logger.logInfo(
             "Current Tilt Elevation Angle: {}".format(currentTiltAngleX)
@@ -208,7 +208,7 @@ class elevation_tracker:
 
                 # New Angle Readings
                 currentTiltAngleX, currentTiltAngleY = self.tiltAngle()
-                currentTiltAngleX = 90 - (float(currentTiltAngleX) * (-1)) + degOffset
+                currentTiltAngleX = 90 - (float(currentTiltAngleX) * (-1)) + self.degOffset
                 self.logger.logInfo("Lens Tilt angle: {}".format(currentTiltAngleX))
                 self.logger.logInfo("Solar Elevation: {}".format(elevation))
 

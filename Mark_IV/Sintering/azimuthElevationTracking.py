@@ -4,6 +4,7 @@ from Logging import logger
 from dotenv import load_dotenv
 from trackSun import find_correction
 from picamera import PiCamera
+import math
 import os 
 
 """
@@ -122,7 +123,7 @@ class tracker:
                 min_az_steps = 25
                 min_elev_steps = 5
                 max_az_steps = 1200
-                max_elev_steps = 40
+                max_elev_steps = 200
                 az_steps = max_az_steps
                 elev_steps = max_elev_steps
 
@@ -132,7 +133,7 @@ class tracker:
                     # Set number of azimuth and elevations steps to take.
                     # Take more movement steps the farther from the middle of the pic the sun is located.
                     az_steps = int(round(pic_info[3] * 3, 0))
-                    elev_steps = int(round(pic_info[4] / 4, 0))
+                    elev_steps = int(round(pic_info[4], 0))
                     if az_steps < min_az_steps: az_steps = min_az_steps
                     elif az_steps > max_az_steps: az_steps = max_az_steps
                     if elev_steps < min_elev_steps: elev_steps = min_elev_steps

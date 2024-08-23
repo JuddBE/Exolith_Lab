@@ -136,7 +136,7 @@ def main():
     if num_args == 2:
         zMoveCoord(float(sys.argv[1]))
     elif num_args == 3:
-        zMoveCoord(float(sys.argv[1]), float(int(sys.argv[2])))
+        zMoveCoord(float(sys.argv[1]), float(sys.argv[2]))
     else:
         zMoveCoord()
     

@@ -28,9 +28,13 @@ Use the app for ease of use, which is pinned on the Exolith sintering slack chan
 (The code provides a command-line interface that allows you to control the regolith sintering stand.) The following commands are available:
 
 python3 xMoveCoord.py [coord] [optional: speed 0-1]
+
 python3 yMoveCoord.py [coord] [optional: speed 0-1]
+
 python3 zMoveCoord.py [coord] [optional: speed 0-1]
+
 python3 runGcode.py [name of gcode file]
+
 python3 shapes.py ["box3d", "box2d", "circle", "cylinder"]
 
 ***Contributions***

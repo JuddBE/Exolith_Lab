@@ -18,6 +18,7 @@ Install the required packages using _pip install -r requirements.txt_.
 Interface with the regolith sintering stand to your computer over wifi/ethernet using ssh.
 
 **How to run**
+
 Run _python3 solarAlignment.py_ to start the automated tracking process to align the lens with the sun.
 
 Run _python3 runGcode.py [name of gcode file]_ to start printing a specific GCODE file.
